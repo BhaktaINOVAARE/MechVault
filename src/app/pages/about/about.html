@@ -1,0 +1,61 @@
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+    <h1 class="page-title">About MechVault</h1>
+
+    <!-- Our Mission Section -->
+    <section class="section">
+      <h2 class="section-title">Our Mission</h2>
+      <p class="section-text">
+        At MechVault, our mission is to provide reliable and efficient vehicle service tracking solutions for both users and
+        administrators. We strive to simplify vehicle maintenance, enhance transparency, and ensure customer satisfaction
+        through innovative technology and exceptional service.
+      </p>
+    </section>
+
+    <!-- Our Values Section -->
+    <section class="section">
+      <h2 class="section-title">Our Values</h2>
+      <p class="section-text">
+        We are committed to integrity, innovation, and customer-centricity. Our core values guide us in every decision and
+        interaction, ensuring we deliver the highest quality service and build lasting relationships with our clients.
+      </p>
+    </section>
+
+    <!-- Our History Section -->
+    <section class="section">
+      <h2 class="section-title">Our History</h2>
+      <p class="section-text">
+        Founded in 2018, MechVault began as a small startup with a vision to revolutionize vehicle service management. Over the
+        years, we have grown into a trusted platform, serving thousands of users and administrators across the nation. Our
+        journey has been marked by continuous improvement, driven by feedback from our valued customers.
+      </p>
+    </section>
+
+    <!-- Meet Our Team Section -->
+    <section class="section">
+      <h2 class="section-title">Meet Our Team</h2>
+      <div class="team-grid">
+        <div class="team-member" *ngFor="let member of teamMembers">
+          <div class="member-image">
+            <img [src]="member.image" [alt]="member.name" />
+          </div>
+          <h3 class="member-name">{{ member.name }}</h3>
+          <p class="member-position">{{ member.position }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section class="section">
+      <h2 class="section-title">Contact Us</h2>
+      <p class="section-text">
+        For any inquiries or support, please reach out to us at 
+        <a href="mailto:support@mechvault.com" class="contact-link">support$mechvault.com</a> 
+        or call us at 
+        <a href="tel:+15551234567" class="contact-link">(555) 123-4567</a>. 
+        We are here to assist you with any questions or concerns.
+      </p>
+    </section>
+  </div>
+</main>

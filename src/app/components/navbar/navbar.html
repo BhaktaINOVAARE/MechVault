@@ -1,0 +1,36 @@
+<header class="main-header">
+  <div class="container">
+    <!-- Logo on left -->
+    <a routerLink="/" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m18 0h-1.5m-15.045-4.122L3.75 7.5M20.25 7.5l-1.295 1.295M3.75 16.5l1.295-1.295M20.25 16.5l-1.295-1.295M12 6.75v.75m0 9v.75m-3.75-6.75h.75m9 0h.75"/>
+      </svg>
+      <span>MechVault</span>
+    </a>
+
+    <!-- Navigation in middle -->
+    <nav class="main-nav">
+      <ul>
+        <li><a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+        <li><a routerLink="/services" routerLinkActive="active">Services</a></li>
+        <li><a routerLink="/about" routerLinkActive="active">About Us</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- Actions on right -->
+    <div class="header-actions">
+      <div class="role-selector">
+        <select (change)="handleRoleChange($event)">
+          <option value="user">User View</option>
+          <option value="admin">Admin View</option>
+        </select>
+      </div>
+      <div class="profile-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>

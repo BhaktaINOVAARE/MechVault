@@ -1,0 +1,109 @@
+:host {
+  --primary-blue: #3B82F6;
+  --dark-gray: #1F2937;
+  --medium-gray: #4B5563;
+  --white: #FFFFFF;
+  --border-color: #E5E7EB;
+}
+
+.main-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 1rem 1rem; /* Equal padding on sides */
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box; /* Ensures padding is included in width */
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%; /* Takes full width of parent */
+}
+
+/* Logo styles */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo svg {
+  width: 32px;
+  height: 32px;
+  color: var(--primary-blue);
+}
+
+.logo span {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+}
+
+/* Navigation styles */
+.main-nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: var(--medium-gray);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+  color: var(--primary-blue);
+}
+
+/* Right side actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.role-selector select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--white);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.profile-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--medium-gray);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.profile-icon svg:hover {
+  color: var(--dark-gray);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .main-nav {
+    display: none;
+  }
+  
+  .container {
+    padding: 1rem 0.5rem;
+  }
+}

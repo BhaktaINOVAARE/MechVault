@@ -1,0 +1,328 @@
+:host {
+    display: block;
+    /* Add margin to prevent content from being hidden behind the fixed navbar */
+    margin-top: 75px; 
+}
+
+/* --- General & Reusable Styles --- */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+section {
+    padding: 80px 0;
+}
+
+h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #1F2937; /* dark-gray */
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1F2937; /* dark-gray */
+    margin-bottom: 0.5rem;
+}
+
+p {
+    color: #4B5563; /* medium-gray */
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.section-intro {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 4rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #3B82F6; /* primary-blue */
+    color: #FFFFFF; /* white */
+    border-color: #3B82F6;
+}
+
+.btn-primary:hover {
+    background-color: #2563EB; /* dark-blue */
+}
+
+.btn-secondary {
+    background-color: #FFFFFF; /* white */
+    color: #3B82F6; /* primary-blue */
+    border: 1px solid #E5E7EB; /* border-color */
+}
+
+.btn-secondary:hover {
+    background-color: #F9FAFB; /* light-gray */
+}
+
+.btn-tertiary {
+    background-color: transparent;
+    color: #FFFFFF;
+    border: 1px solid #FFFFFF;
+}
+
+.btn-tertiary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* --- Hero Section --- */
+.hero {
+    /* Replace with your actual image path in assets */
+    background-image: linear-gradient(rgba(20, 30, 40, 0.7), rgba(20, 30, 40, 0.7)), url('https://images.unsplash.com/photo-1553523940-2e3a65c71a23?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    color: #FFFFFF; /* white */
+    text-align: center;
+    padding: 100px 0;
+}
+
+.hero h1 {
+    color: #FFFFFF;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+/* --- Features Section --- */
+.features {
+    background-color: #F9FAFB; /* light-gray */
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background-color: #FFFFFF; /* white */
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB; /* border-color */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.feature-card .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border-radius: 8px;
+    background-color: #EFF6FF; /* light-blue */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-card .icon {
+    width: 28px;
+    height: 28px;
+    color: #3B82F6; /* primary-blue */
+}
+
+/* --- Testimonials Section --- */
+.testimonials {
+    background-color: #FFFFFF; /* white */
+}
+
+.testimonial-card {
+    background-color: #EFF6FF; /* light-blue */
+    border: 1px solid #DBEAFE; /* Lighter blue for border */
+    border-radius: 12px;
+    padding: 2.5rem;
+    max-width: 800px;
+    margin: 4rem auto 0;
+    text-align: center;
+}
+
+.stars {
+    color: #FBBF24; /* A nice yellow for stars */
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.testimonial-quote {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: #1F2937; /* dark-gray */
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #3B82F6; /* primary-blue */
+    color: #FFFFFF; /* white */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.author-details {
+    text-align: left;
+}
+
+.author-details p {
+    margin: 0;
+}
+
+.author-details .name {
+    font-weight: 600;
+    color: #1F2937; /* dark-gray */
+}
+
+.author-details .title {
+    font-size: 0.9rem;
+}
+
+/* --- How It Works Section --- */
+.how-it-works {
+    background-color: #F9FAFB; /* light-gray */
+}
+
+.steps-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-top: 4rem;
+    text-align: center;
+    position: relative;
+}
+
+.step {
+    flex: 1;
+    position: relative;
+    padding: 0 1rem;
+}
+
+/* Dashed line connecting the steps */
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 25px; /* Vertically center with the number circle */
+    left: 50%;
+    width: 100%;
+    transform: translateX(50%);
+    border-top: 2px dashed #93C5FD; /* A lighter blue */
+    z-index: 0;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #3B82F6; /* primary-blue */
+    color: #FFFFFF; /* white */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+    position: relative;
+    z-index: 1; /* Ensure number is above the dashed line */
+}
+
+/* --- CTA Section --- */
+.cta {
+    background-color: #3B82F6; /* primary-blue */
+    color: #FFFFFF; /* white */
+    text-align: center;
+}
+
+.cta h2, .cta p {
+    color: #FFFFFF;
+}
+
+.cta p {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .hero h1 { font-size: 2.5rem; }
+    h2 { font-size: 2rem; }
+}
+
+@media (max-width: 768px) {
+    section { padding: 60px 0; }
+    
+    .hero { padding: 80px 0; }
+    
+    .steps-container {
+        flex-direction: column;
+        gap: 3rem;
+    }
+    
+    .step:not(:last-child)::after {
+        width: 2px;
+        height: 100%;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-top: none;
+        border-left: 2px dashed #93C5FD;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .btn {
+        width: 80%;
+        max-width: 300px;
+    }
+}
