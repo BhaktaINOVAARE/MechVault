@@ -231,7 +231,17 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription.add(sub);
   }
 
-  deleteRequest(id: string): void {
+  deleteRequest(id: string,request: ServiceRequest): void {
+
+    if (request.status === 'Completed') {
+      this.snackBar.open(
+        'You cannot edit the request after it has been accepted by Admin.',
+        'Close',
+        { duration: 3000 }
+      );
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '350px',
       data: {
