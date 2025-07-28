@@ -117,20 +117,29 @@ export class RequestFormComponent implements OnInit {
   onSubmit() {
     if (this.requestForm.valid) {
       const formData = this.requestForm.value;
-      console.log('Form Data:', formData);
-      const request: ServiceRequest = {
-        id: this.isEditMode ? this.data.request.id : this.generateId(),
-        ...formData,
-        status: this.isEditMode ? this.data.request.status : 'Pending',
-      };
 
       if (this.isEditMode) {
+        const updatedRequest: Partial<ServiceRequest> = {
+          ...formData,
+          status: this.data.request.status, // keep existing status
+        };
+
+        console.log('Updating request:', updatedRequest);
+
         this.requestService
-          .updateRequest(request.id, request)
+          .updateRequest(this.data.request.id, updatedRequest)
           .subscribe(() => this.dialogRef.close(true));
       } else {
+        const newRequest: ServiceRequest = {
+          id: this.generateId(), // only for frontend temporary id if needed
+          ...formData,
+          status: 'Pending',
+        };
+
+        console.log('Creating new request:', newRequest);
+
         this.requestService
-          .addRequest(request)
+          .addRequest(newRequest)
           .subscribe(() => this.dialogRef.close(true));
       }
     }

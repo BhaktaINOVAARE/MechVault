@@ -31,7 +31,7 @@ class ServiceRequestSchema(BaseModel):
         pattern=r"^(Pending|Completed|Rejected)$",
         alias="status"  # This stays the same
     )
-    created_at: Optional[datetime] = None
+    # created_at: Optional[datetime] = None
 
     class Config:
         allow_population_by_field_name = True  # Allows creation using both field names and aliases

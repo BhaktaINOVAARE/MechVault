@@ -5,11 +5,8 @@ from app.schemas.service_request import ServiceRequestSchema
 router = APIRouter(prefix="/requests", tags=["Requests"])
 
 @router.get("/")
-def get_requests(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(10, ge=1, le=100)
-):
-    return db.get_all_requests(skip, limit)
+def get_requests():
+    return db.get_all_requests()
 
 @router.post("/", status_code=201)
 def add_request(req: ServiceRequestSchema):
@@ -30,4 +27,10 @@ def reject_request(id: str):
         raise HTTPException(404, "Request not found")
     return {"message": "Request rejected"}
 
-
+@router.put("/{id}")
+def update_request(id: str, req: ServiceRequestSchema):
+    print(f"Updating request with ID: {id} and data: {req}")
+    ok = db.update_request(id, req)
+    if not ok:
+        raise HTTPException(404, "Request not found")
+    return {"message": "Request updated"}

@@ -11,8 +11,8 @@ def serialize(doc: dict) -> dict:
     doc["id"] = str(doc.pop("_id"))
     return doc
 
-def get_all_requests(skip: int = 0, limit: int = 10) -> list[dict]:
-    cursor = collection.find().skip(skip).limit(limit)
+def get_all_requests() -> list[dict]:
+    cursor = collection.find()
     return [serialize(doc) for doc in cursor]
 
 def create_request(payload: ServiceRequestSchema) -> str:
@@ -25,6 +25,15 @@ def update_status(id: str, status: str) -> bool:
     res = collection.update_one(
         {"_id": ObjectId(id)},
         {"$set": {"status": status}}
+    )
+    return res.modified_count == 1
+
+def update_request(id: str, payload: ServiceRequestSchema) -> bool:
+    doc = payload.model_dump()
+    print(f"Model dump for update: {doc}")
+    res = collection.update_one(
+        {"_id": ObjectId(id)},
+        {"$set": doc}
     )
     return res.modified_count == 1
 
