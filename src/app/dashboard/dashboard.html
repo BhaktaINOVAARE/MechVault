@@ -1,0 +1,123 @@
+<div class="dashboard-container">
+<!-- Stats Cards -->
+<div class="stats-container">
+  <mat-card class="stat-card">
+    <mat-card-title>Total Requests</mat-card-title>
+    <mat-card-content class="stat-value">{{ totalRequests }}</mat-card-content>
+  </mat-card>
+
+  <!-- <mat-card class="stat-card">
+      <mat-card-title>Total Revenue ($)</mat-card-title>
+      <mat-card-content class="stat-value">{{ totalRevenue | number }}</mat-card-content>
+    </mat-card> -->
+
+  <mat-card class="stat-card">
+    <mat-card-title>Pending Requests</mat-card-title>
+    <mat-card-content class="stat-value">{{
+      pendingRequests
+    }}</mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card">
+    <mat-card-title>Completed Requests</mat-card-title>
+    <mat-card-content class="stat-value">{{
+      completedRequests
+    }}</mat-card-content>
+  </mat-card>
+</div>
+
+<!-- Requests Table -->
+<div class="table-container">
+  <mat-form-field class="filter-field">
+    <mat-label>Filter</mat-label>
+    <input
+      matInput
+      (keyup)="applyFilter($event)"
+      placeholder="Ex. Vehicle No"
+      #input
+    />
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <!-- Vehicle No Column -->
+    <ng-container matColumnDef="vehicleNo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Vehicle No.</th>
+      <td mat-cell *matCellDef="let request">{{ request.vehicleNo }}</td>
+    </ng-container>
+
+    <!-- Owner Name Column -->
+    <ng-container matColumnDef="ownerName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Owner Name</th>
+      <td mat-cell *matCellDef="let request">{{ request.ownerName }}</td>
+    </ng-container>
+
+    <!-- Date Column -->
+    <ng-container matColumnDef="preferredDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+      <td mat-cell *matCellDef="let request">
+        {{ request.preferredDate | date }}
+      </td>
+    </ng-container>
+
+    <!-- Time Column -->
+    <ng-container matColumnDef="preferredTime">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Time</th>
+      <td mat-cell *matCellDef="let request">{{ request.preferredTime }}</td>
+    </ng-container>
+
+    <!-- Estimated Cost Column -->
+    <!-- <ng-container matColumnDef="estimatedCost">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Estimated Cost</th>
+        <td mat-cell *matCellDef="let request">{{ request.estimatedCost | currency }}</td>
+      </ng-container> -->
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let request">
+        <span [class]="'status-badge ' + request.status.toLowerCase()">
+          {{ request.status }}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let request">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="viewRequestDetails(request)"
+        >
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="approveRequest(request)"
+          *ngIf="request.status === 'Pending'"
+        >
+          <mat-icon>check</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="rejectRequest(request)"
+          *ngIf="request.status === 'Pending'"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>
+</div>

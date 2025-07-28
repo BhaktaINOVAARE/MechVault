@@ -1,0 +1,65 @@
+.container {
+  padding: 20px;
+  margin-top: 6rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+
+.status-badge.in-progress {
+  background-color: #D1ECF1;
+  color: #0C5460;
+}
+
+.status-badge.completed {
+  background-color: #D4EDDA;
+  color: #155724;
+}
+
+.status-badge.cancelled {
+  background-color: #F8D7DA;
+  color: #721C24;
+}
+
+mat-form-field {
+  width: 90%;
+  margin:  0 auto 20px auto;
+  display: block;
+}
+
+table {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 0px 40px;
+}
+
+
+.mat-column-actions button {
+  margin: 0 4px;
+}
+.services-container {
+  display: block;
+  padding: 20px;
+}

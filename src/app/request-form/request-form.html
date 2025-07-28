@@ -1,0 +1,174 @@
+<div class="dialog-container">
+  <h1 class="dialog-title">
+    {{ isEditMode ? "Edit" : "Add" }} Service Request
+  </h1>
+
+  <div class="dialog-content">
+    <form [formGroup]="requestForm">
+      <ng-container *ngFor="let field of formConfig">
+        <!-- Section Fields -->
+        <div *ngIf="field.type === 'section'" class="section-container">
+          <h3>{{field.label}}</h3>
+          <div *ngFor="let subField of field.fields || []">
+            <ng-container *ngIf="!subField.conditional || shouldShowField(subField)">
+              <mat-form-field appearance="outline" class="full-width">
+                <!-- Input Field -->
+                <input
+                  *ngIf="subField.type === 'input'"
+                  matInput
+                  [formControlName]="subField.name"
+                  [placeholder]="subField.placeholder || 'Enter ' + subField.label"
+                  [type]="subField.inputType || 'text'"
+                />
+
+                <!-- Select Field -->
+                <mat-select
+                  *ngIf="subField.type === 'select'"
+                  [formControlName]="subField.name"
+                  [placeholder]="subField.placeholder || 'Select ' + subField.label"
+                >
+                  <mat-option *ngFor="let option of subField.options || []" [value]="option">
+                    {{ option }}
+                  </mat-option>
+                </mat-select>
+
+                <!-- Checkbox Field -->
+                <mat-checkbox
+                  *ngIf="subField.type === 'checkbox'"
+                  [formControlName]="subField.name"
+                >
+                  {{subField.label}}
+                </mat-checkbox>
+
+                <!-- Date Picker -->
+                <input
+                  *ngIf="subField.type === 'date'"
+                  matInput
+                  [formControlName]="subField.name"
+                  [matDatepicker]="picker"
+                  [placeholder]="subField.placeholder || 'Select date'"
+                />
+                <mat-datepicker-toggle
+                  *ngIf="subField.type === 'date'"
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+
+                <!-- Time Picker -->
+                <input
+                  *ngIf="subField.type === 'time'"
+                  matInput
+                  [formControlName]="subField.name"
+                  type="time"
+                  [placeholder]="subField.placeholder || 'Select time'"
+                />
+
+                <!-- Textarea -->
+                <textarea
+                  *ngIf="subField.type === 'textarea'"
+                  matInput
+                  [formControlName]="subField.name"
+                  [placeholder]="subField.placeholder || 'Enter ' + subField.label"
+                  rows="3"
+                ></textarea>
+
+                <!-- Error Messages -->
+                <mat-error *ngIf="requestForm.get(subField.name)?.errors?.['required']">
+                  This field is required
+                </mat-error>
+                <mat-error *ngIf="requestForm.get(subField.name)?.errors?.['pattern']">
+                  {{ getErrorMessage(subField) }}
+                </mat-error>
+              </mat-form-field>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Regular Fields -->
+        <mat-form-field *ngIf="field.type !== 'section'" appearance="outline" class="full-width">
+          <!-- Input Field -->
+          <input
+            *ngIf="field.type === 'input'"
+            matInput
+            [formControlName]="field.name"
+            [placeholder]="field.placeholder || 'Enter ' + field.label"
+            [type]="field.inputType || 'text'"
+          />
+
+          <!-- Select Field -->
+          <mat-select
+            *ngIf="field.type === 'select'"
+            [formControlName]="field.name"
+            [placeholder]="field.placeholder || 'Select ' + field.label"
+          >
+            <mat-option *ngFor="let option of field.options || []" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-select>
+
+          <!-- Checkbox Field -->
+          <mat-checkbox
+            *ngIf="field.type === 'checkbox'"
+            [formControlName]="field.name"
+          >
+            {{field.label}}
+          </mat-checkbox>
+
+          <!-- Date Picker -->
+          <input
+            *ngIf="field.type === 'date'"
+            matInput
+            [formControlName]="field.name"
+            [matDatepicker]="picker"
+            [placeholder]="field.placeholder || 'Select date'"
+          />
+          <mat-datepicker-toggle
+            *ngIf="field.type === 'date'"
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+
+          <!-- Time Picker -->
+          <input
+            *ngIf="field.type === 'time'"
+            matInput
+            [formControlName]="field.name"
+            type="time"
+            [placeholder]="field.placeholder || 'Select time'"
+          />
+
+          <!-- Textarea -->
+          <textarea
+            *ngIf="field.type === 'textarea'"
+            matInput
+            [formControlName]="field.name"
+            [placeholder]="field.placeholder || 'Enter ' + field.label"
+            rows="3"
+          ></textarea>
+
+          <!-- Error Messages -->
+          <mat-error *ngIf="requestForm.get(field.name)?.errors?.['required']">
+            This field is required
+          </mat-error>
+          <mat-error *ngIf="requestForm.get(field.name)?.errors?.['pattern']">
+            {{ getErrorMessage(field) }}
+          </mat-error>
+        </mat-form-field>
+      </ng-container>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="requestForm.invalid"
+    >
+      {{ isEditMode ? "Update" : "Submit" }}
+    </button>
+  </div>
+</div>

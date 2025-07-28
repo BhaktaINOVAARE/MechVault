@@ -1,0 +1,76 @@
+[
+  {
+    "type": "input",
+    "name": "vehicleNo",
+    "label": "Vehicle Number",
+    "placeholder": "E.g. MH12AB1234, DL01CD5678",
+    "required": true,
+    "validations": [
+      {
+        "type": "pattern",
+        "value": "^[A-Z]{2}[0-9]{1,2}[A-Z]{0,2}[0-9]{4}$",
+        "message": "Format: StateCode(2-letters)Number(1-2)OptionalLetters(0-2)Number(4)"
+      }
+    ]
+  },
+  {
+    "type": "select",
+    "name": "vehicleType",
+    "label": "Vehicle Type",
+    "options": ["Car", "Truck", "SUV", "Motorcycle", "Van"],
+    "required": true
+  },
+  {
+    "type": "input",
+    "name": "vehicleModel",
+    "label": "Vehicle Brand/Model",
+    "placeholder": "Enter brand and model"
+  },
+  {
+    "type": "date",
+    "name": "preferredDate",
+    "label": "Preferred Date",
+    "required": true
+  },
+  {
+    "type": "time",
+    "name": "preferredTime",
+    "label": "Preferred Time",
+    "required": true
+  },
+  {
+    "type": "input",
+    "name": "ownerName",
+    "label": "Owner Name",
+    "placeholder": "Enter your name",
+    "required": true,
+    "validations": [
+      {
+        "type": "pattern",
+        "value": "^[a-zA-Z ]+$",
+        "message": "Name should contain only letters"
+      }
+    ]
+  },
+  {
+    "type": "input",
+    "name": "contactNumber",
+    "label": "Contact Number",
+    "inputType": "tel",
+    "placeholder": "Enter phone no.",
+    "required": true,
+    "validations": [
+      {
+        "type": "pattern",
+        "value": "^[0-9]{10}$",
+        "message": "Invalid phone number (10 digits required)"
+      }
+    ]
+  },
+  {
+    "type": "textarea",
+    "name": "notes",
+    "label": "Notes/Description",
+    "placeholder": "Enter any additional information"
+  }
+]
