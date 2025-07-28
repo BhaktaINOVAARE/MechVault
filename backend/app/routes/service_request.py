@@ -15,14 +15,14 @@ def add_request(req: ServiceRequestSchema):
 
 @router.patch("/{id}/approve")
 def approve_request(id: str):
-    ok = db.update_status(id, "accepted")
+    ok = db.update_status(id, "Completed")
     if not ok:
         raise HTTPException(404, "Request not found")
     return {"message": "Request approved"}
 
 @router.patch("/{id}/reject")
 def reject_request(id: str):
-    ok = db.update_status(id, "rejected")
+    ok = db.update_status(id, "Rejected")
     if not ok:
         raise HTTPException(404, "Request not found")
     return {"message": "Request rejected"}

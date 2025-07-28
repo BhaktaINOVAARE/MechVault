@@ -9,8 +9,9 @@ export interface ServiceRequest {
   contactNumber?: string;
   status: 'Pending' | 'Completed' | 'Rejected';
   notes?: string;
-  created_at?: number | string;
+  // created_at?: number | string;
 }
+export type ServiceRequestUpdate = Omit<ServiceRequest, 'id'>;   //added this one
 
 // export interface ServiceRequest {
 //   id: string;

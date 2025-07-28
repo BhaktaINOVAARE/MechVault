@@ -279,8 +279,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
         return item.preferredTime;
       case 'status':
         return item.status;
-      case 'created_at':
-        return item.created_at ?? ''; // Handle optional field
+      // case 'created_at':
+      //   return item.created_at ?? ''; // Handle optional field
       default:
         return '';
     }
@@ -363,19 +363,29 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openEditRequestDialog(request: ServiceRequest): void {
-    const dialogRef = this.dialog.open(RequestFormComponent, {
-      width: '80%',
-      maxHeight: '90vh',
-      panelClass: 'scrollable-dialog',
-      data: { request },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.fetchRequests();
-      }
-    });
+  if (request.status === 'Completed') {
+    this.snackBar.open(
+      'You cannot edit the request after it has been accepted by Admin.',
+      'Close',
+      { duration: 3000 }
+    );
+    return;
   }
+
+  const dialogRef = this.dialog.open(RequestFormComponent, {
+    width: '80%',
+    maxHeight: '90vh',
+    panelClass: 'scrollable-dialog',
+    data: { request },
+  });
+
+  dialogRef.afterClosed().subscribe((result) => {
+    if (result) {
+      this.fetchRequests();
+    }
+  });
+}
+
 
   viewRequestDetails(request: ServiceRequest): void {
     this.dialog.open(RequestDetailsComponent, {

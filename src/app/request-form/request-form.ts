@@ -26,7 +26,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RequestService } from '../services/request.service';
-import { ServiceRequest } from '../models/service-request.model';
+import {
+  ServiceRequest,
+  ServiceRequestUpdate,
+} from '../models/service-request.model';
 import { MatOptionModule } from '@angular/material/core';
 import { MatError } from '@angular/material/form-field';
 import formConfig from '../../assets/form-config.json';
@@ -118,29 +121,42 @@ export class RequestFormComponent implements OnInit {
     if (this.requestForm.valid) {
       const formData = this.requestForm.value;
 
-      if (this.isEditMode) {
-        const updatedRequest: Partial<ServiceRequest> = {
-          ...formData,
-          status: this.data.request.status, // keep existing status
-        };
+      const safeFormData: ServiceRequestUpdate = {
+        ownerName: formData.ownerName || '',
+        vehicleNo: formData.vehicleNo || '',
+        vehicleType: formData.vehicleType || '',
+        contactNumber: formData.contactNumber || '',
+        vehicleModel: formData.vehicleModel || '',
+        preferredDate: formData.preferredDate || '',
+        preferredTime: formData.preferredTime || '',
+        notes: formData.notes || '',
+        status: this.isEditMode ? this.data.request.status : 'Pending',
+      };
 
-        console.log('Updating request:', updatedRequest);
+      if (this.isEditMode) {
+        if (this.data.request.status === 'Completed') {
+          alert(
+            'You cannot edit the request after it has been accepted by Admin.'
+          );
+          return;
+        }
 
         this.requestService
-          .updateRequest(this.data.request.id, updatedRequest)
-          .subscribe(() => this.dialogRef.close(true));
+          .updateRequest(this.data.request.id, safeFormData)
+          .subscribe({
+            next: () => this.dialogRef.close(true),
+            error: (err) => console.error('Update failed', err),
+          });
       } else {
         const newRequest: ServiceRequest = {
-          id: this.generateId(), // only for frontend temporary id if needed
-          ...formData,
-          status: 'Pending',
+          id: this.generateId(),
+          ...safeFormData,
         };
 
-        console.log('Creating new request:', newRequest);
-
-        this.requestService
-          .addRequest(newRequest)
-          .subscribe(() => this.dialogRef.close(true));
+        this.requestService.addRequest(newRequest).subscribe({
+          next: () => this.dialogRef.close(true),
+          error: (err) => console.error('Creation failed', err),
+        });
       }
     }
   }

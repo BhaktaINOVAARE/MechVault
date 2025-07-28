@@ -80,8 +80,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           return item.preferredTime;
         case 'status':
           return item.status;
-        case 'created_at':
-          return item.created_at ?? '';
+        // case 'created_at':
+        //   return item.created_at ?? '';
         default:
           return '';
       }
