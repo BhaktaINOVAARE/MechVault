@@ -304,6 +304,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
           status: request.status,
           notes: request.notes,
           created_at: request.created_at,
+          contactNumber: request.contact_number,
+          vehicleType: request.vehicle_type,
         }));
 
         console.log('Transformed requests:', transformedRequests);

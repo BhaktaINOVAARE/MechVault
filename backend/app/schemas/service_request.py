@@ -20,6 +20,8 @@ from datetime import datetime
 class ServiceRequestSchema(BaseModel):
     name: str = Field(..., alias="ownerName")  # Maps ownerName (frontend) to name (backend)
     vehicle_number: str = Field(..., alias="vehicleNo")  # Maps vehicleNo to vehicle_number
+    vehicle_type: str = Field(..., alias="vehicleType")  # Maps vehicleType to vehicle_type
+    contact_number: str = Field(..., alias="contactNumber")  # Maps contactNumber to contact_number
     model: str = Field(..., alias="vehicleModel")  # Maps vehicleModel to model
     requested_date: str = Field(..., alias="preferredDate")  # Maps preferredDate to requested_date
     requested_time: str = Field(..., alias="preferredTime")  # Maps preferredTime to requested_time
