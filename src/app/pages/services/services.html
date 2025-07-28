@@ -12,7 +12,7 @@
     <input
       matInput
       (keyup)="applyFilter($event)"
-      placeholder="Ex. Vehicle No, Owner Name"
+      placeholder="Ex. Vehicle No, Owner Name, Time or Date"
       #input
     />
     <mat-icon matSuffix>search</mat-icon>
@@ -20,7 +20,7 @@
 
   <div class="table-container">
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-      <!-- Vehicle No Column -->
+      <!-- Vehicle Number Column -->
       <ng-container matColumnDef="vehicleNo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Vehicle No.</th>
         <td mat-cell *matCellDef="let request">{{ request.vehicleNo }}</td>
