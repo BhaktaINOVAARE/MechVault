@@ -30,7 +30,6 @@ def update_status(id: str, status: str) -> bool:
 
 def update_request(id: str, payload: ServiceRequestSchema) -> bool:
     doc = payload.model_dump()
-    print(f"Model dump for update: {doc}")
     res = collection.update_one(
         {"_id": ObjectId(id)},
         {"$set": doc}
@@ -49,3 +48,9 @@ def get_dashboard_summary() -> dict:
         "Completed": Completed,
         "Rejected": Rejected
     }
+
+def delete_status(id: str, status: str) -> int:
+    res = collection.delete_one(
+        {"_id": ObjectId(id)},
+    )
+    return res.deleted_count

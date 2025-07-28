@@ -29,8 +29,14 @@ def reject_request(id: str):
 
 @router.put("/{id}")
 def update_request(id: str, req: ServiceRequestSchema):
-    print(f"Updating request with ID: {id} and data: {req}")
     ok = db.update_request(id, req)
     if not ok:
         raise HTTPException(404, "Request not found")
     return {"message": "Request updated"}
+
+@router.delete("/{id}")
+def delete_request(id: str):
+    ok = db.delete_status(id, "Deleted")
+    if ok == 0:
+        raise HTTPException(404, "Request not found")
+    return {"message": "Request deleted"}
