@@ -180,7 +180,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const dialogRef = this.dialog.open(RequestFormComponent, {
       width: '80%',
-      maxHeight: '90vh',
+      maxHeight: '120vh',
       panelClass: 'scrollable-dialog',
       data: { request },
     });
@@ -199,6 +199,9 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+
+  //the below code is not needed here i services.ts it will be used in dashboard.ts for
+  //approving the requests 
   approveRequest(id: string): void {
     const sub = this.requestService.approveRequest(id).subscribe({
       next: () => {

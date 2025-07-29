@@ -26,13 +26,12 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RequestService } from '../services/request.service';
-import {
-  ServiceRequest,
-  ServiceRequestUpdate,
-} from '../models/service-request.model';
+import {ServiceRequest,ServiceRequestUpdate,} from '../models/service-request.model';
 import { MatOptionModule } from '@angular/material/core';
 import { MatError } from '@angular/material/form-field';
 import formConfig from '../../assets/form-config.json';
+import { provideNativeDateAdapter } from '@angular/material/core';
+
 
 interface FormField {
   type: string;
@@ -68,11 +67,12 @@ interface FormField {
     MatOptionModule,
     MatError,
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './request-form.html',
   styleUrls: ['./request-form.css'],
 })
 export class RequestFormComponent implements OnInit {
-  // formConfig = formConfig;
+  
   formConfig: FormField[] = formConfig;
   requestForm!: FormGroup;
   isEditMode = false;
@@ -209,68 +209,3 @@ export class RequestFormComponent implements OnInit {
   }
 }
 
-// import { Component, OnInit } from '@angular/core';
-// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-// import { Router } from '@angular/router';
-// import { RequestService } from '../services/request.service';
-// import { ServiceRequest } from '../models/service-request.model';
-// import formConfig from '../../assets/form-config.json';
-
-// @Component({
-//   selector: 'app-request-form',
-//   templateUrl: './request-form.html',
-//   styleUrls: ['./request-form.css']
-// })
-// export class RequestFormComponent implements OnInit {
-//   requestForm!: FormGroup;
-//   formConfig = formConfig as any[];
-//   isEditMode = false;                         // ← missing
-//   requestId: string | null = null;            // ← helps if you later add edit
-
-//   constructor(
-//     private fb: FormBuilder,
-//     private requestService: RequestService,
-//     private router: Router
-//   ) {}
-
-//   ngOnInit(): void {
-//     this.buildForm();
-//   }
-
-//   private buildForm(): void {
-//     const controls: any = {};
-//     this.formConfig.forEach(field => {
-//       const validators = field.required ? [Validators.required] : [];
-//       if (field.validations) {
-//         field.validations.forEach((v: any) => {
-//           if (v.type === 'pattern') validators.push(Validators.pattern(v.value));
-//         });
-//       }
-//       controls[field.name] = ['', validators];
-//     });
-//     this.requestForm = this.fb.group(controls);
-//   }
-
-//   shouldShowField(field: any): boolean {
-//     // simple implementation – extend as needed
-//     return true;
-//   }
-
-//   getErrorMessage(fieldName: string): string {
-//     const control = this.requestForm.get(fieldName);
-//     if (control?.hasError('required')) return 'This field is required';
-//     if (control?.hasError('pattern'))  return 'Invalid format';
-//     return '';
-//   }
-
-//   onSubmit(): void {
-//     if (this.requestForm.invalid) return;
-//     this.requestService.createRequest(this.requestForm.value).subscribe(() => {
-//       this.router.navigate(['/services']);
-//     });
-//   }
-
-//   onCancel(): void {
-//     this.router.navigate(['/services']);
-//   }
-// }
