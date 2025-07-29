@@ -1,5 +1,5 @@
 .container {
-  padding: 20px;
+  padding: 0px 20px 20px 20px;
   margin-top: 6rem;
 }
 
@@ -8,6 +8,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 2.7rem;
+  font-weight: 700;
+  color: #2592ff;
+  margin-left: 160px;
+  padding-top: 0px;
 }
 
 .no-data-message {
@@ -23,7 +31,7 @@
   font-weight: 500;
 }
 
-.status-badge.pending {
+.status-badge.status-Pending {
   background-color: #FFF3CD;
   color: #856404;
 }
@@ -33,12 +41,12 @@
   color: #0C5460;
 }
 
-.status-badge.completed {
+.status-badge.status-Completed {
   background-color: #D4EDDA;
   color: #155724;
 }
 
-.status-badge.cancelled {
+.status-badge.status-Rejected {
   background-color: #F8D7DA;
   color: #721C24;
 }

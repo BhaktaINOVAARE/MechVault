@@ -87,8 +87,7 @@ p {
 /* --- Hero Section --- */
 .hero {
     position: relative;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                      url('../../../assets/car.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)), url('../../../assets/car-3.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -149,7 +148,7 @@ p {
     height: 98px;
     margin: 0 auto 1.5rem;
     border-radius: 8px;
-    background-color: #EFF6FF; /* light-blue */
+    background-color: #bfd6f4; /* light-blue */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,7 +157,7 @@ p {
 .feature-card .icon {
     width: 58px;
     height: 58px;
-    color: #3B82F6; /* primary-blue */
+    color: #407ee3; /* primary-blue */
 }
 
 /* --- Testimonials Section --- */

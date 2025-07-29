@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
+
 interface TeamMember {
   name: string;
   position: string;
@@ -18,17 +19,17 @@ export class AboutComponent {
     {
       name: 'Ethan Harper',
       position: 'CEO',
-      image: 'assets/images/ethan-harper.jpg'
+      image: '/person-1.jpg'
     },
     {
       name: 'Sophia Bennett',
       position: 'CTO',
-      image: 'assets/images/sophia-bennett.jpg'
+      image: '/person-2.jpg'
     },
     {
       name: 'Liam Carter',
       position: 'Head of Customer Success',
-      image: 'assets/images/liam-carter.jpg'
+      image: '/person-3.jpg'
     }
   ];
 

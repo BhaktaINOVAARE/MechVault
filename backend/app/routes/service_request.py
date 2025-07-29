@@ -37,7 +37,7 @@ def update_request(id: str, req: ServiceRequestSchema):
 
 @router.delete("/delete/requests/{id}")
 def delete_request(id: str):
-    ok = db.delete_status(id, "Deleted")
+    ok = db.delete_status(id)
     if ok == 0:
         raise HTTPException(404, "Request not found")
     return {"message": "Request deleted"}

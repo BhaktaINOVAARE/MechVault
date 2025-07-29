@@ -28,10 +28,7 @@ export class RequestService {
     );
   }
 
-  updateRequest(
-    id: string,
-    request: Partial<ServiceRequest>
-  ): Observable<{ message: string }> {
+  updateRequest(id: string,request: Partial<ServiceRequest>): Observable<{ message: string }> {
     return this.http.put<{ message: string }>(
       `${this.baseUrl}/update/requests/${id}`,
       request

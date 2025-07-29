@@ -169,9 +169,9 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openEditRequestDialog(request: ServiceRequest): void {
-    if (request.status === 'Completed') {
+    if (request.status === 'Completed' || request.status === 'Rejected') {
       this.snackBar.open(
-        'You cannot edit the request after it has been accepted by Admin.',
+        'You cannot edit the request after it has been processed by Admin.',
         'Close',
         { duration: 3000 }
       );

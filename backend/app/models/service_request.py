@@ -49,7 +49,7 @@ def get_dashboard_summary() -> dict:
         "Rejected": Rejected
     }
 
-def delete_status(id: str, status: str) -> int:
+def delete_status(id: str) -> int:
     res = collection.delete_one(
         {"_id": ObjectId(id)},
     )
