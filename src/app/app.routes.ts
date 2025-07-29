@@ -4,6 +4,7 @@ import { AboutComponent } from './pages/about/about';
 import { ContactComponent } from './pages/contact/contact';
 import { ServicesComponent } from './pages/services/services';
 import { DashboardComponent } from './dashboard/dashboard';
+import { NotFound } from './not-found/not-found';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'dashboard', component: DashboardComponent }
+  { path: 'dashboard', component: DashboardComponent },
+  { path: '**', component: NotFound }
 ];
