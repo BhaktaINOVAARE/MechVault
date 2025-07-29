@@ -1,18 +1,3 @@
-# from pydantic import BaseModel, Field
-# from typing import Optional
-# from datetime import datetime
-
-# class ServiceRequestSchema(BaseModel):
-#     name: str
-#     vehicle_number: str
-#     model: str
-#     requested_date: str
-#     requested_time: str
-#     notes: Optional[str] = ""
-#     status: Optional[str] = Field(default="Pending", pattern=r"^(Pending|Completed|Rejected)$")
-#     created_at: Optional[datetime] = None
-
-
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime

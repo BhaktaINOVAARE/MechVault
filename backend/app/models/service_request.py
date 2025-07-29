@@ -11,9 +11,21 @@ def serialize(doc: dict) -> dict:
     doc["id"] = str(doc.pop("_id"))
     return doc
 
-def get_all_requests() -> list[dict]:
-    cursor = collection.find()
+
+######################################################################
+
+# new functions added for pagination requests
+def get_paginated_requests(skip: int, limit: int) -> list[dict]:
+    cursor = collection.find().skip(skip).limit(limit)
     return [serialize(doc) for doc in cursor]
+
+def get_total_requests_count() -> int:
+    return collection.count_documents({})
+
+######################################################################
+# def get_all_requests() -> list[dict]:
+#     cursor = collection.find()
+#     return [serialize(doc) for doc in cursor]
 
 def create_request(payload: ServiceRequestSchema) -> str:
     doc = payload.model_dump()

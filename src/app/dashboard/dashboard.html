@@ -17,8 +17,15 @@
     </mat-card>
   </div>
 
+
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <span class="loading-text">Loading requests...</span>
+  </div>
+
+  
   <!-- Requests Table -->
-  <div class="table-container">
+  <div class="table-container" [class.loading]="isLoading">
     <mat-form-field class="filter-field">
       <mat-label>Filter</mat-label>
       <input

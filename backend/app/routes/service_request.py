@@ -5,9 +5,26 @@ from app.schemas.service_request import ServiceRequestSchema
 
 router = APIRouter(tags=["Requests"])
 
+# @router.get("/get/requests")
+# def get_requests():
+#     return db.get_all_requests()
+
 @router.get("/get/requests")
-def get_requests():
-    return db.get_all_requests()
+def get_requests(skip: int = Query(0, ge=0), limit: int = Query(5, gt=0)):
+    requests = db.get_paginated_requests(skip, limit)
+    total = db.get_total_requests_count()
+    return {"requests": requests, "total": total}
+
+@router.get("/get/requests/stats")
+def get_dashboard_stats():
+    total = db.collection.count_documents({})
+    pending = db.collection.count_documents({"status": "Pending"})
+    completed = db.collection.count_documents({"status": "Completed"})
+    return {
+        "total": total,
+        "pending": pending,
+        "completed": completed
+    }
 
 @router.post("/post/requests", status_code=201)
 def add_request(req: ServiceRequestSchema):

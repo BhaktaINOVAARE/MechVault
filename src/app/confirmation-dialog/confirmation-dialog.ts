@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
     <mat-dialog-content>{{ data.message }}</mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button [mat-dialog-close]="false">{{ data.buttonText?.cancel || 'Cancel' }}</button>
-      <button mat-raised-button color="warn" [mat-dialog-close]="true">{{ data.buttonText?.ok || 'Confirm' }}</button>
+      <button mat-flat-button class="filled-button" color="warn" [mat-dialog-close]="true">{{ data.buttonText?.ok || 'Confirm' }}</button>
     </mat-dialog-actions>
   `
 })

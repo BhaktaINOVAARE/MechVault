@@ -21,6 +21,16 @@ import { RequestService } from '../../services/request.service';
 import { RequestFormComponent } from '../../request-form/request-form';
 import { RequestDetailsComponent } from '../../request-details/request-details';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+
+//newly added for sorting functionality
+function compare(a: any, b: any, isAsc: boolean): number {
+  const valA = a instanceof Date ? a.getTime() : a;
+  const valB = b instanceof Date ? b.getTime() : b;
+  return (valA < valB ? -1 : valA > valB ? 1 : 0) * (isAsc ? 1 : -1);
+}
+
 
 @Component({
   selector: 'app-services',
@@ -35,6 +45,7 @@ import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmat
     MatFormFieldModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './services.html',
   styleUrls: ['./services.css'],
@@ -61,46 +72,125 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     private snackBar: MatSnackBar
   ) {}
 
+  //newly added variable ====================================
+  totalRequests = 0;
+  currentPageData: ServiceRequest[] = [];
+  isLoading = false;
+
+  // ngOnInit(): void {
+  //   this.fetchRequests();
+  // }
   ngOnInit(): void {
-    this.fetchRequests();
+    this.fetchRequests(0, this.paginator?.pageSize || 5);
   }
 
+  // ngAfterViewInit(): void {
+  //   this.dataSource.sort = this.sort;
+  //   this.dataSource.paginator = this.paginator;
+
+  //   this.dataSource.sortingDataAccessor = (
+  //     item: ServiceRequest,
+  //     property: string
+  //   ): string | number => {
+  //     // Explicitly handle each sortable property
+  //     switch (property) {
+  //       case 'preferredDate':
+  //         return new Date(item.preferredDate).getTime();
+  //       case 'vehicleNo':
+  //         return item.vehicleNo;
+  //       case 'ownerName':
+  //         return item.ownerName;
+  //       case 'preferredTime':
+  //         return item.preferredTime;
+  //       case 'status':
+  //         return item.status;
+  //       default:
+  //         return '';
+  //     }
+  //   };
+  // }
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.paginator.page.subscribe(() => {
+      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize);
+    });
 
-    this.dataSource.sortingDataAccessor = (
-      item: ServiceRequest,
-      property: string
-    ): string | number => {
-      // Explicitly handle each sortable property
-      switch (property) {
-        case 'preferredDate':
-          return new Date(item.preferredDate).getTime();
-        case 'vehicleNo':
-          return item.vehicleNo;
-        case 'ownerName':
-          return item.ownerName;
-        case 'preferredTime':
-          return item.preferredTime;
-        case 'status':
-          return item.status;
-        // case 'created_at':
-        //   return item.created_at ?? ''; // Handle optional field
-        default:
-          return '';
-      }
-    };
+    this.sort.sortChange.subscribe(() => {
+      this.sortCurrentPageData();
+    });
   }
+
+
+  //newly added function for sorting
+  sortCurrentPageData(): void {
+    const data = this.currentPageData.slice();
+    if (!this.sort.active || this.sort.direction === '') {
+      this.dataSource.data = data;
+      return;
+    }
+
+    this.dataSource.data = data.sort((a, b) => {
+      const isAsc = this.sort.direction === 'asc';
+      switch (this.sort.active) {
+        case 'vehicleNo':
+          return compare(a.vehicleNo, b.vehicleNo, isAsc);
+        case 'ownerName':
+          return compare(a.ownerName, b.ownerName, isAsc);
+        case 'preferredDate':
+          return compare(new Date(a.preferredDate).getTime(), new Date(b.preferredDate).getTime(), isAsc);
+        case 'preferredTime':
+          return compare(a.preferredTime, b.preferredTime, isAsc);
+        case 'status':
+          return compare(a.status, b.status, isAsc);
+        default:
+          return 0;
+      }
+    });
+  }
+
+
+
+
+  //adding a new function here
+
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
-  fetchRequests(): void {
-    this.requestService.getAllRequests().subscribe({
-      next: (backendRequests) => {
-        const transformedRequests = backendRequests.map((request: any) => ({
+  // fetchRequests(): void {
+  //   this.requestService.getAllRequests().subscribe({
+  //     next: (backendRequests) => {
+  //       const transformedRequests = backendRequests.map((request: any) => ({
+  //         id: request.id,
+  //         vehicleNo: request.vehicle_number,
+  //         ownerName: request.name,
+  //         vehicleModel: request.model,
+  //         preferredDate: request.requested_date,
+  //         preferredTime: request.requested_time,
+  //         status: request.status,
+  //         notes: request.notes,
+  //         created_at: request.created_at,
+  //         contactNumber: request.contact_number,
+  //         vehicleType: request.vehicle_type,
+  //       }));
+
+  //       console.log('Transformed requests:', transformedRequests);
+  //       this.dataSource.data = transformedRequests;
+  //     },
+  //     error: (err) => {
+  //       this.snackBar.open('Failed to load requests', 'Close', {
+  //         duration: 3000,
+  //       });
+  //       console.error(err);
+  //     },
+  //   });
+  // }
+  fetchRequests(pageIndex: number, pageSize: number): void {
+    this.isLoading = true; // setting loading state to true
+    this.requestService.getAllRequests(pageIndex, pageSize).subscribe({
+      next: (response) => {
+        this.currentPageData = response.requests.map((request: any) => ({
           id: request.id,
           vehicleNo: request.vehicle_number,
           ownerName: request.name,
@@ -114,14 +204,16 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
           vehicleType: request.vehicle_type,
         }));
 
-        console.log('Transformed requests:', transformedRequests);
-        this.dataSource.data = transformedRequests;
+        this.dataSource.data = [...this.currentPageData];
+        this.paginator.length = response.total;
+        this.isLoading = false; // setting loading state to false
       },
       error: (err) => {
         this.snackBar.open('Failed to load requests', 'Close', {
           duration: 3000,
         });
         console.error(err);
+        this.isLoading = false; // setting loading state to false even on error
       },
     });
   }
@@ -163,7 +255,9 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.fetchRequests();
+        //where ever fetchRequest() was called here in this code
+        //  i passed the arguments this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5
+        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
       }
     });
   }
@@ -187,7 +281,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.fetchRequests();
+        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
       }
     });
   }
@@ -199,14 +293,13 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
   //the below code is not needed here i services.ts it will be used in dashboard.ts for
-  //approving the requests 
+  //approving the requests
   approveRequest(id: string): void {
     const sub = this.requestService.approveRequest(id).subscribe({
       next: () => {
         this.snackBar.open('Request approved', 'Close', { duration: 2000 });
-        this.fetchRequests();
+        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
       },
       error: (error: Error) => {
         this.snackBar.open('Failed to approve request', 'Close', {
@@ -222,7 +315,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     const sub = this.requestService.rejectRequest(id).subscribe({
       next: () => {
         this.snackBar.open('Request rejected', 'Close', { duration: 2000 });
-        this.fetchRequests();
+        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
       },
       error: (error: Error) => {
         this.snackBar.open('Failed to reject request', 'Close', {
@@ -234,8 +327,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription.add(sub);
   }
 
-  deleteRequest(id: string,request: ServiceRequest): void {
-
+  deleteRequest(id: string, request: ServiceRequest): void {
     if (request.status === 'Completed') {
       this.snackBar.open(
         'You cannot edit the request after it has been accepted by Admin.',
@@ -264,7 +356,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
             this.snackBar.open('Request deleted successfully', 'Close', {
               duration: 2000,
             });
-            this.fetchRequests();
+            this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
           },
           error: (error) => {
             this.snackBar.open('Failed to delete request', 'Close', {
