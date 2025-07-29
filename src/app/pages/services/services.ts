@@ -180,7 +180,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const dialogRef = this.dialog.open(RequestFormComponent, {
       width: '80%',
-      maxHeight: '120vh',
+      maxHeight: '90vh',
       panelClass: 'scrollable-dialog',
       data: { request },
     });
