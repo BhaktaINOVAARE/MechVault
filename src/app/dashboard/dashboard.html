@@ -3,27 +3,31 @@
   <div class="stats-container">
     <mat-card class="stat-card-1">
       <mat-card-title>Total Requests</mat-card-title>
-      <mat-card-content class="stat-value-1">{{ totalRequests }}</mat-card-content>
+      <mat-card-content class="stat-value-1">{{
+        totalRequests
+      }}</mat-card-content>
     </mat-card>
 
     <mat-card class="stat-card-2">
       <mat-card-title>Pending Requests</mat-card-title>
-      <mat-card-content class="stat-value-2">{{ pendingRequests }}</mat-card-content>
+      <mat-card-content class="stat-value-2">{{
+        pendingRequests
+      }}</mat-card-content>
     </mat-card>
 
     <mat-card class="stat-card-3">
       <mat-card-title>Completed Requests</mat-card-title>
-      <mat-card-content class="stat-value-3">{{ completedRequests }}</mat-card-content>
+      <mat-card-content class="stat-value-3">{{
+        completedRequests
+      }}</mat-card-content>
     </mat-card>
   </div>
-
 
   <div class="loading-overlay" *ngIf="isLoading">
     <mat-spinner diameter="50"></mat-spinner>
     <span class="loading-text">Loading requests...</span>
   </div>
 
-  
   <!-- Requests Table -->
   <div class="table-container" [class.loading]="isLoading">
     <mat-form-field class="filter-field">
@@ -36,6 +40,95 @@
       />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
+
+    <!-- Advanced Search Form -->
+    <form class="advanced-search-form" (ngSubmit)="applyAdvancedSearch()">
+      <div class="search-fields">
+        <!-- Vehicle No Search -->
+        <mat-form-field>
+          <mat-label>Vehicle No</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchParams.vehicleNo"
+            name="vehicleNo"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="searchParams.vehicleNo = ''; applyAdvancedSearch()"
+            *ngIf="searchParams.vehicleNo"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Owner Name Search -->
+        <mat-form-field>
+          <mat-label>Owner Name</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchParams.ownerName"
+            name="ownerName"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="searchParams.ownerName = ''; applyAdvancedSearch()"
+            *ngIf="searchParams.ownerName"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Date Search -->
+        <mat-form-field>
+          <mat-label>Preferred Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="datePicker"
+            [(ngModel)]="searchParams.preferredDate"
+            name="preferredDate"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="datePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #datePicker></mat-datepicker>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="searchParams.preferredDate = null; applyAdvancedSearch()"
+            *ngIf="searchParams.preferredDate"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Time Search -->
+        <mat-form-field>
+          <mat-label>Preferred Time</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchParams.preferredTime"
+            name="preferredTime"
+            placeholder="HH:MM"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="searchParams.preferredTime = ''; applyAdvancedSearch()"
+            *ngIf="searchParams.preferredTime"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Search Button -->
+        <button mat-flat-button color="primary" type="submit">
+          <mat-icon>search</mat-icon> Search
+        </button>
+      </div>
+    </form>
 
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
       <!-- Vehicle No Column -->
@@ -52,7 +145,9 @@
 
       <!-- Preferred Date Column -->
       <ng-container matColumnDef="preferredDate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Date</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Preferred Date
+        </th>
         <td mat-cell *matCellDef="let request">
           {{ formatDateForDisplay(request.preferredDate) }}
         </td>
@@ -60,7 +155,9 @@
 
       <!-- Preferred Time Column -->
       <ng-container matColumnDef="preferredTime">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Preferred Time</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Preferred Time
+        </th>
         <td mat-cell *matCellDef="let request">{{ request.preferredTime }}</td>
       </ng-container>
 
@@ -78,27 +175,30 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let request" class="action-buttons">
-          <button 
-            mat-icon-button 
-            color="primary" 
+          <button
+            mat-icon-button
+            color="primary"
             (click)="viewRequestDetails(request)"
-            matTooltip="View Details">
+            matTooltip="View Details"
+          >
             <mat-icon>visibility</mat-icon>
           </button>
-          <button 
-            mat-icon-button 
-            color="primary" 
+          <button
+            mat-icon-button
+            color="primary"
             (click)="approveRequest(request.id)"
             *ngIf="request.status === 'Pending'"
-            matTooltip="Approve Request">
+            matTooltip="Approve Request"
+          >
             <mat-icon>check_circle</mat-icon>
           </button>
-          <button 
-            mat-icon-button 
-            color="warn" 
+          <button
+            mat-icon-button
+            color="warn"
             (click)="rejectRequest(request.id)"
             *ngIf="request.status === 'Pending'"
-            matTooltip="Reject Request">
+            matTooltip="Reject Request"
+          >
             <mat-icon>cancel</mat-icon>
           </button>
         </td>
@@ -118,7 +218,8 @@
     <mat-paginator
       [pageSizeOptions]="[5, 10, 20]"
       showFirstLastButtons
-      aria-label="Select page of service requests">
+      aria-label="Select page of service requests"
+    >
     </mat-paginator>
   </div>
 </div>

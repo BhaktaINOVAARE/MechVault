@@ -3,12 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ServiceRequest } from '../models/service-request.model';
 
-
 interface DashboardStats {
   total: number;
   pending: number;
   completed: number;
 }
+
+interface PaginatedRequestsResponse {
+  requests: any[]; // or use a more specific type like ServiceRequest[]
+  total: number;
+}
+
 
 @Injectable({ providedIn: 'root' })
 export class RequestService {
@@ -20,11 +25,28 @@ export class RequestService {
   //   return this.http.get<ServiceRequest[]>(`${this.baseUrl}/get/requests`);
   // }
 
-  getAllRequests(page: number = 0, pageSize: number = 5): Observable<{requests: ServiceRequest[], total: number}> {
-    return this.http.get<{requests: ServiceRequest[], total: number}>(
-      `${this.baseUrl}/get/requests?skip=${page * pageSize}&limit=${pageSize}`
-    );
+  // getAllRequests(page: number = 0, pageSize: number = 5): Observable<{requests: ServiceRequest[], total: number}> {
+  //   return this.http.get<{requests: ServiceRequest[], total: number}>(
+  //     `${this.baseUrl}/get/requests?skip=${page * pageSize}&limit=${pageSize}`
+  //   );
+  // }
+
+  getAllRequests(params?: any): Observable<PaginatedRequestsResponse> {
+  let url = `${this.baseUrl}/get/requests`;
+  
+  // Add query parameters if they exist
+  if (params) {
+    const queryParams = new URLSearchParams();
+    for (const key in params) {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    }
+    url += `?${queryParams.toString()}`;
   }
+
+  return this.http.get<PaginatedRequestsResponse>(url);
+}
 
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.baseUrl}/get/requests/stats`);

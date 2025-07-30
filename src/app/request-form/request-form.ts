@@ -152,6 +152,7 @@ export class RequestFormComponent implements OnInit {
           id: this.generateId(),
           ...safeFormData,
         };
+        console.log('Creating new request:', newRequest);
 
         this.requestService.addRequest(newRequest).subscribe({
           next: () => this.dialogRef.close(true),

@@ -2,6 +2,8 @@ from datetime import datetime
 from bson import ObjectId
 from app.database import collection
 from app.schemas.service_request import ServiceRequestSchema
+from typing import Optional, Dict, Any
+from pytz import timezone
 
 def serialize(doc: dict) -> dict:
     """Convert MongoDB document to JSON-serializable dict."""
@@ -10,6 +12,56 @@ def serialize(doc: dict) -> dict:
     doc = dict(doc)                 # copy
     doc["id"] = str(doc.pop("_id"))
     return doc
+
+
+def build_query(
+    vehicleNo: Optional[str] = None,
+    ownerName: Optional[str] = None,
+    preferredDate: Optional[str] = None,
+    preferredTime: Optional[str] = None
+) -> Dict[str, Any]:
+    """Build MongoDB query dictionary based on filters"""
+    query = {}
+    
+    if vehicleNo:
+        query["vehicle_number"] = {"$regex": vehicleNo, "$options": "i"}
+    if ownerName:
+        query["name"] = {"$regex": ownerName, "$options": "i"}
+    if preferredDate:
+        query["requested_date"] = preferredDate
+    if preferredTime:
+        query["requested_time"] = preferredTime
+        
+    return query
+
+def get_filtered_requests(
+    skip: int = 0,
+    limit: int = 5,
+    vehicleNo: Optional[str] = None,
+    ownerName: Optional[str] = None,
+    preferredDate: Optional[str] = None,
+    preferredTime: Optional[str] = None
+) -> Dict[str, Any]:
+    """Get paginated and filtered requests"""
+    query = build_query(vehicleNo, ownerName, preferredDate, preferredTime)
+    
+    cursor = collection.find(query).skip(skip).limit(limit)
+    total = collection.count_documents(query)
+    
+    return {
+        "requests": [serialize(doc) for doc in cursor],
+        "total": total
+    }
+
+def convert_to_utc(indian_time_str: str) -> datetime:
+    """Convert Indian time string to UTC datetime"""
+    try:
+        # Parse Indian time string (e.g., "Wed Jul 16 2025 00:00:00 GMT+0530")
+        dt = datetime.strptime(indian_time_str, '%a %b %d %Y %H:%M:%S GMT%z')
+        # Convert to UTC and remove timezone info
+        return dt.astimezone(timezone('UTC')).replace(tzinfo=None)
+    except ValueError:
+        raise ValueError("Invalid date format")
 
 
 ######################################################################

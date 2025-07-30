@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.models import service_request as db
 from app.schemas.service_request import ServiceRequestSchema
+from typing import Optional, Dict, Any
 
 
 router = APIRouter(tags=["Requests"])
@@ -9,11 +10,33 @@ router = APIRouter(tags=["Requests"])
 # def get_requests():
 #     return db.get_all_requests()
 
+
+
+
+# @router.get("/get/requests")
+# def get_requests(skip: int = Query(0, ge=0), limit: int = Query(5, gt=0)):
+#     requests = db.get_paginated_requests(skip, limit)
+#     total = db.get_total_requests_count()
+#     return {"requests": requests, "total": total}
+
 @router.get("/get/requests")
-def get_requests(skip: int = Query(0, ge=0), limit: int = Query(5, gt=0)):
-    requests = db.get_paginated_requests(skip, limit)
-    total = db.get_total_requests_count()
-    return {"requests": requests, "total": total}
+def get_requests(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(5, gt=0),
+    vehicleNo: Optional[str] = None,
+    ownerName: Optional[str] = None,
+    preferredDate: Optional[str] = None,
+    preferredTime: Optional[str] = None
+):
+    """Endpoint for getting paginated and filtered requests"""
+    return db.get_filtered_requests(
+        skip=skip,
+        limit=limit,
+        vehicleNo=vehicleNo,
+        ownerName=ownerName,
+        preferredDate=preferredDate,
+        preferredTime=preferredTime
+    )
 
 @router.get("/get/requests/stats")
 def get_dashboard_stats():

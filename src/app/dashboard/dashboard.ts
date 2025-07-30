@@ -21,6 +21,9 @@ import { ServiceRequest } from '../models/service-request.model';
 import { RequestService } from '../services/request.service';
 import { Subscription } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepicker, MatDatepickerModule, MatDatepickerToggle } from '@angular/material/datepicker';
+import { FormsModule } from '@angular/forms';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 //newly added for sorting functionality
@@ -51,7 +54,12 @@ interface DashboardStats {
     MatInputModule,
     MatCardModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDatepicker,
+    MatDatepickerToggle,
+    FormsModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
@@ -85,6 +93,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   //newly added variable ====================================
   currentPageData: ServiceRequest[] = [];
   isLoading = false;
+  searchParams = {
+    vehicleNo: '',
+    ownerName: '',
+    preferredDate: null as Date | null,
+    preferredTime: '',
+  };
 
 
   // ngOnInit(): void {
@@ -125,7 +139,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.dataSource.sort = this.sort;
     this.paginator.page.subscribe(() => {
-      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize);
+      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize, this.searchParams);
     });
 
     this.sort.sortChange.subscribe(() => {
@@ -196,12 +210,30 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   //     })
   //   );
   // }
-  fetchRequests(pageIndex: number, pageSize: number): void {
+  fetchRequests(pageIndex: number, pageSize: number,searchParams?:any): void {
 
     this.isLoading = true; // setting loading state to true
 
+    // Prepare query parameters
+    const params: any = {
+      skip: pageIndex * pageSize,
+      limit: pageSize,
+    };
+
+    // Add search parameters if they exist
+    if (searchParams) {
+      if (this.searchParams.vehicleNo)
+        params.vehicleNo = this.searchParams.vehicleNo;
+      if (this.searchParams.ownerName)
+        params.ownerName = this.searchParams.ownerName;
+      if (this.searchParams.preferredDate)
+        params.preferredDate = this.searchParams.preferredDate;
+      if (this.searchParams.preferredTime)
+        params.preferredTime = this.searchParams.preferredTime;
+    }
+    
     this.subscription.add(
-      this.requestService.getAllRequests(pageIndex, pageSize).subscribe({
+      this.requestService.getAllRequests(params).subscribe({
         next: (response) => {
           this.currentPageData = response.requests.map((request: any) => ({
             id: request.id,
@@ -233,6 +265,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       })
     );
+  }
+
+  //newly added method for advanced filtering search
+  applyAdvancedSearch(): void {
+    // Reset to first page when applying new search
+    this.paginator.pageIndex = 0;
+    this.fetchRequests(0, this.paginator.pageSize, this.searchParams);
   }
 
   fetchDashboardStats(): void {
@@ -280,6 +319,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilter(event: Event): void {
+
+    this.searchParams = {
+      vehicleNo: '',
+      ownerName: '',
+      preferredDate: null,
+      preferredTime: '',
+    };
+    
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 

@@ -22,7 +22,9 @@ import { RequestFormComponent } from '../../request-form/request-form';
 import { RequestDetailsComponent } from '../../request-details/request-details';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import {MatDatepicker,MatDatepickerModule,MatDatepickerToggle,} from '@angular/material/datepicker';
+import { FormsModule } from '@angular/forms';
+import { MatNativeDateModule } from '@angular/material/core';
 
 //newly added for sorting functionality
 function compare(a: any, b: any, isAsc: boolean): number {
@@ -30,7 +32,6 @@ function compare(a: any, b: any, isAsc: boolean): number {
   const valB = b instanceof Date ? b.getTime() : b;
   return (valA < valB ? -1 : valA > valB ? 1 : 0) * (isAsc ? 1 : -1);
 }
-
 
 @Component({
   selector: 'app-services',
@@ -45,7 +46,12 @@ function compare(a: any, b: any, isAsc: boolean): number {
     MatFormFieldModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDatepicker,
+    MatDatepickerToggle,
+    FormsModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './services.html',
   styleUrls: ['./services.css'],
@@ -72,10 +78,16 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     private snackBar: MatSnackBar
   ) {}
 
-  //newly added variable ====================================
+  //newly added properties ====================================
   totalRequests = 0;
   currentPageData: ServiceRequest[] = [];
   isLoading = false;
+  searchParams = {
+    vehicleNo: '',
+    ownerName: '',
+    preferredDate: null as Date | null,
+    preferredTime: '',
+  };
 
   // ngOnInit(): void {
   //   this.fetchRequests();
@@ -112,14 +124,13 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.paginator.page.subscribe(() => {
-      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize);
+      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize,this.searchParams);
     });
 
     this.sort.sortChange.subscribe(() => {
       this.sortCurrentPageData();
     });
   }
-
 
   //newly added function for sorting
   sortCurrentPageData(): void {
@@ -137,7 +148,11 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
         case 'ownerName':
           return compare(a.ownerName, b.ownerName, isAsc);
         case 'preferredDate':
-          return compare(new Date(a.preferredDate).getTime(), new Date(b.preferredDate).getTime(), isAsc);
+          return compare(
+            new Date(a.preferredDate).getTime(),
+            new Date(b.preferredDate).getTime(),
+            isAsc
+          );
         case 'preferredTime':
           return compare(a.preferredTime, b.preferredTime, isAsc);
         case 'status':
@@ -148,11 +163,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
-
-
   //adding a new function here
-
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -186,9 +197,28 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   //     },
   //   });
   // }
-  fetchRequests(pageIndex: number, pageSize: number): void {
+  fetchRequests(pageIndex: number, pageSize: number, searchParams?: any): void {
     this.isLoading = true; // setting loading state to true
-    this.requestService.getAllRequests(pageIndex, pageSize).subscribe({
+
+    // Prepare query parameters
+    const params: any = {
+      skip: pageIndex * pageSize,
+      limit: pageSize,
+    };
+
+    // Add search parameters if they exist
+    if (searchParams) {
+      if (this.searchParams.vehicleNo)
+        params.vehicleNo = this.searchParams.vehicleNo;
+      if (this.searchParams.ownerName)
+        params.ownerName = this.searchParams.ownerName;
+      if (this.searchParams.preferredDate)
+        params.preferredDate = this.searchParams.preferredDate;
+      if (this.searchParams.preferredTime)
+        params.preferredTime = this.searchParams.preferredTime;
+    }
+
+    this.requestService.getAllRequests(params).subscribe({
       next: (response) => {
         this.currentPageData = response.requests.map((request: any) => ({
           id: request.id,
@@ -204,6 +234,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
           vehicleType: request.vehicle_type,
         }));
 
+        console.log('Fetched requests:', this.currentPageData);
+        console.log('Total requests:', response);
         this.dataSource.data = [...this.currentPageData];
         this.paginator.length = response.total;
         this.isLoading = false; // setting loading state to false
@@ -216,6 +248,34 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoading = false; // setting loading state to false even on error
       },
     });
+  }
+
+  //newly added method for advanced filtering search
+  applyAdvancedSearch(): void {
+    // Reset to first page when applying new search
+    this.paginator.pageIndex = 0;
+    this.fetchRequests(0, this.paginator.pageSize, this.searchParams);
+  }
+
+  //newly added method
+
+  // Update quick filter to reset advanced search
+  applyQuickFilter(event: Event): void {
+    // Clear advanced search fields
+    this.searchParams = {
+      vehicleNo: '',
+      ownerName: '',
+      preferredDate: null,
+      preferredTime: '',
+    };
+
+    // Apply quick filter
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   // Safe date formatter for display
@@ -257,7 +317,10 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
       if (result) {
         //where ever fetchRequest() was called here in this code
         //  i passed the arguments this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5
-        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
+        this.fetchRequests(
+          this.paginator?.pageIndex || 0,
+          this.paginator?.pageSize || 5
+        );
       }
     });
   }
@@ -281,7 +344,10 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
+        this.fetchRequests(
+          this.paginator?.pageIndex || 0,
+          this.paginator?.pageSize || 5
+        );
       }
     });
   }
@@ -299,7 +365,10 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     const sub = this.requestService.approveRequest(id).subscribe({
       next: () => {
         this.snackBar.open('Request approved', 'Close', { duration: 2000 });
-        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
+        this.fetchRequests(
+          this.paginator?.pageIndex || 0,
+          this.paginator?.pageSize || 5
+        );
       },
       error: (error: Error) => {
         this.snackBar.open('Failed to approve request', 'Close', {
@@ -315,7 +384,10 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     const sub = this.requestService.rejectRequest(id).subscribe({
       next: () => {
         this.snackBar.open('Request rejected', 'Close', { duration: 2000 });
-        this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
+        this.fetchRequests(
+          this.paginator?.pageIndex || 0,
+          this.paginator?.pageSize || 5
+        );
       },
       error: (error: Error) => {
         this.snackBar.open('Failed to reject request', 'Close', {
@@ -356,7 +428,10 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
             this.snackBar.open('Request deleted successfully', 'Close', {
               duration: 2000,
             });
-            this.fetchRequests(this.paginator?.pageIndex || 0, this.paginator?.pageSize || 5);
+            this.fetchRequests(
+              this.paginator?.pageIndex || 0,
+              this.paginator?.pageSize || 5
+            );
           },
           error: (error) => {
             this.snackBar.open('Failed to delete request', 'Close', {
