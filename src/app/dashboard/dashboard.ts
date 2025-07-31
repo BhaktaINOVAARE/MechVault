@@ -21,10 +21,13 @@ import { ServiceRequest } from '../models/service-request.model';
 import { RequestService } from '../services/request.service';
 import { Subscription } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDatepicker, MatDatepickerModule, MatDatepickerToggle } from '@angular/material/datepicker';
+import {
+  MatDatepicker,
+  MatDatepickerModule,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
-
 
 //newly added for sorting functionality
 function compare(a: any, b: any, isAsc: boolean): number {
@@ -59,7 +62,7 @@ interface DashboardStats {
     MatDatepickerToggle,
     FormsModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
@@ -96,15 +99,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   searchParams = {
     vehicleNo: '',
     ownerName: '',
-    preferredDate: null as Date | null,
+    fromDate: null as Date | null,
+    toDate: null as Date | null,
     preferredTime: '',
   };
-
+  lastUsedFilters: any = {};
 
   // ngOnInit(): void {
   //   this.fetchRequests();
   // }
   ngOnInit(): void {
+    this.lastUsedFilters = {}; //default empty
     this.dataSource.paginator = this.paginator;
     this.fetchRequests(0, this.paginator?.pageSize || 5);
     this.fetchDashboardStats();
@@ -139,11 +144,23 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.dataSource.sort = this.sort;
     this.paginator.page.subscribe(() => {
-      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize, this.searchParams);
+      this.fetchRequests(
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.lastUsedFilters
+      );
     });
 
+    // this.sort.sortChange.subscribe(() => {
+    //   this.sortCurrentPageData();
+    // });
     this.sort.sortChange.subscribe(() => {
-      this.sortCurrentPageData();
+      this.paginator.pageIndex = 0; // reset to first page
+      this.fetchRequests(
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.lastUsedFilters
+      );
     });
   }
 
@@ -210,8 +227,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   //     })
   //   );
   // }
-  fetchRequests(pageIndex: number, pageSize: number,searchParams?:any): void {
-
+  fetchRequests(pageIndex: number, pageSize: number, searchParams?: any): void {
     this.isLoading = true; // setting loading state to true
 
     // Prepare query parameters
@@ -222,16 +238,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Add search parameters if they exist
     if (searchParams) {
-      if (this.searchParams.vehicleNo)
-        params.vehicleNo = this.searchParams.vehicleNo;
-      if (this.searchParams.ownerName)
-        params.ownerName = this.searchParams.ownerName;
-      if (this.searchParams.preferredDate)
-        params.preferredDate = this.searchParams.preferredDate;
-      if (this.searchParams.preferredTime)
-        params.preferredTime = this.searchParams.preferredTime;
+      if (searchParams.vehicleNo) params.vehicleNo = searchParams.vehicleNo;
+      if (searchParams.ownerName) params.ownerName = searchParams.ownerName;
+      if (searchParams.fromDate && searchParams.toDate) {
+        params.fromDate = searchParams.fromDate;
+        params.toDate = searchParams.toDate;
+      } else if (searchParams.fromDate) {
+        params.fromDate = searchParams.fromDate;
+      } else if (searchParams.toDate) {
+        params.toDate = searchParams.toDate;
+      }
+      if (searchParams.preferredTime)
+        params.preferredTime = searchParams.preferredTime;
     }
-    
+
+    if (this.sort?.active) {
+      params.sortField = this.sort.active;
+      params.sortOrder = this.sort.direction || 'asc';
+    }
+
     this.subscription.add(
       this.requestService.getAllRequests(params).subscribe({
         next: (response) => {
@@ -259,7 +284,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         },
         error: (err) => {
-          this.showError('Failed to load requests');
+          this.snackBar.open('Failed to load requests', 'Close', {
+            duration: 3000,
+          });
           console.error(err);
           this.isLoading = false; // setting loading state to false
         },
@@ -269,9 +296,43 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //newly added method for advanced filtering search
   applyAdvancedSearch(): void {
+
+    if (!this.validateDateRange()) {
+      this.snackBar.open('Error: End date must be after start date', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar'],
+      });
+      return;
+    }
+
     // Reset to first page when applying new search
     this.paginator.pageIndex = 0;
-    this.fetchRequests(0, this.paginator.pageSize, this.searchParams);
+
+    // Create API params with properly formatted date
+    this.lastUsedFilters = {
+      vehicleNo: this.searchParams.vehicleNo,
+      ownerName: this.searchParams.ownerName,
+      fromDate: this.formatDateForAPI(this.searchParams.fromDate),
+      toDate: this.formatDateForAPI(this.searchParams.toDate),
+      preferredTime: this.searchParams.preferredTime,
+    };
+
+    this.fetchRequests(0, this.paginator.pageSize, this.lastUsedFilters);
+  }
+
+  private formatDateForAPI(date: Date | null): string {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // stays in IST
+  }
+
+  validateDateRange(): boolean {
+    if (this.searchParams.fromDate && this.searchParams.toDate) {
+      return this.searchParams.fromDate <= this.searchParams.toDate;
+    }
+    return true;
   }
 
   fetchDashboardStats(): void {
@@ -286,7 +347,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           // Fallback to client-side calculation if API fails
           this.calculateStats(this.dataSource.data);
           console.error(err);
-        }
+        },
       })
     );
   }
@@ -319,14 +380,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilter(event: Event): void {
-
     this.searchParams = {
       vehicleNo: '',
       ownerName: '',
-      preferredDate: null,
+      fromDate: null,
+      toDate: null,
       preferredTime: '',
     };
-    
+
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 

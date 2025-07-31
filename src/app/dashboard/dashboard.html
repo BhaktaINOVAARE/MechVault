@@ -82,27 +82,24 @@
 
         <!-- Date Search -->
         <mat-form-field>
-          <mat-label>Preferred Date</mat-label>
-          <input
-            matInput
-            [matDatepicker]="datePicker"
-            [(ngModel)]="searchParams.preferredDate"
-            name="preferredDate"
-          />
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="datePicker"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #datePicker></mat-datepicker>
-          <button
-            mat-icon-button
-            matSuffix
-            (click)="searchParams.preferredDate = null; applyAdvancedSearch()"
-            *ngIf="searchParams.preferredDate"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromDatePicker" [(ngModel)]="searchParams.fromDate" name="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromDatePicker></mat-datepicker>
+        <button mat-icon-button matSuffix (click)="searchParams.fromDate = null; applyAdvancedSearch()" *ngIf="searchParams.fromDate">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toDatePicker" [(ngModel)]="searchParams.toDate" name="toDate">
+        <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #toDatePicker></mat-datepicker>
+        <button mat-icon-button matSuffix (click)="searchParams.toDate = null; applyAdvancedSearch()" *ngIf="searchParams.toDate">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
         <!-- Time Search -->
         <mat-form-field>
