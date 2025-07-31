@@ -4,7 +4,7 @@ from app.database import collection
 from app.schemas.service_request import ServiceRequestSchema
 from typing import Optional, Dict, Any
 from pytz import timezone
-from fastapi import HTTPException
+from pymongo import ASCENDING, DESCENDING
 
 def serialize(doc: dict) -> dict:
     """Convert MongoDB document to JSON-serializable dict."""
@@ -65,16 +65,33 @@ def get_filtered_requests(
     ownerName: Optional[str] = None,
     fromDate: Optional[str] = None,
     toDate: Optional[str] = None,
-    preferredTime: Optional[str] = None
+    preferredTime: Optional[str] = None,
+    sortField: Optional[str] = None,
+    sortOrder: Optional[str] = None
 ) -> Dict[str, Any]:
     """Get paginated and filtered requests with fromDate/toDate support."""
     
     query = build_query(vehicleNo, ownerName, fromDate, toDate, preferredTime)
 
+    sort_list = [("_id", DESCENDING)]
+
+    if sortField:
+        mongo_field_map = {
+            "vehicleNo": "vehicle_number",
+            "ownerName": "name",
+            "preferredDate": "requested_date",
+            "preferredTime": "requested_time",
+            "status": "status",
+        }
+        field = mongo_field_map.get(sortField, "_id")  # fallback to _id
+        order = ASCENDING if sortOrder == "asc" else DESCENDING
+        sort_list = [(field, order)]
+
+
     # 🔍 Debug: Check what we're actually querying
     print(f"📌 Mongo Query: {query}")
 
-    cursor = collection.find(query).skip(skip).limit(limit)
+    cursor = collection.find(query).sort(sort_list).skip(skip).limit(limit)
     total = collection.count_documents(query)
 
     return {

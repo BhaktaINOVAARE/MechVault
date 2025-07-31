@@ -98,11 +98,14 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     toDate: null as Date | null,
     preferredTime: '',
   };
+  lastUsedFilters: any = {};
+
 
   // ngOnInit(): void {
   //   this.fetchRequests();
   // }
   ngOnInit(): void {
+    this.lastUsedFilters = {}; //default empty
     this.fetchRequests(0, this.paginator?.pageSize || 5);
   }
 
@@ -133,16 +136,25 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   // }
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+
     this.paginator.page.subscribe(() => {
       this.fetchRequests(
         this.paginator.pageIndex,
         this.paginator.pageSize,
-        this.searchParams
+        this.lastUsedFilters
       );
     });
 
+    // this.sort.sortChange.subscribe(() => {
+    //   this.sortCurrentPageData();
+    // });
     this.sort.sortChange.subscribe(() => {
-      this.sortCurrentPageData();
+      this.paginator.pageIndex = 0; // reset to first page
+      this.fetchRequests(
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.lastUsedFilters
+      );
     });
   }
 
@@ -236,6 +248,11 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
         params.preferredTime = searchParams.preferredTime;
     }
 
+    if (this.sort?.active) {
+      params.sortField = this.sort.active;
+      params.sortOrder = this.sort.direction || 'asc';
+    }
+
     console.log('Sending to API:', params);
 
     this.requestService.getAllRequests(params).subscribe({
@@ -284,7 +301,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginator.pageIndex = 0;
 
     // Create API params with properly formatted date
-    const apiParams = {
+    this.lastUsedFilters = {
       vehicleNo: this.searchParams.vehicleNo,
       ownerName: this.searchParams.ownerName,
       fromDate: this.formatDateForAPI(this.searchParams.fromDate),
@@ -292,8 +309,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
       preferredTime: this.searchParams.preferredTime,
     };
 
-    console.log('formatted API params:', apiParams);
-    this.fetchRequests(0, this.paginator.pageSize, apiParams);
+    console.log('formatted API params:', this.lastUsedFilters);
+    this.fetchRequests(0, this.paginator.pageSize, this.lastUsedFilters);
   }
 
   // private formatDateForAPI(date: Date | string | null): string {

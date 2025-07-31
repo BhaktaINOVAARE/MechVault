@@ -27,7 +27,9 @@ def get_requests(
     ownerName: Optional[str] = None,
     fromDate: Optional[str] = None,
     toDate: Optional[str] = None,
-    preferredTime: Optional[str] = None
+    preferredTime: Optional[str] = None,
+    sortField: Optional[str] = None,
+    sortOrder: Optional[str] = None
 ):
     """Endpoint for getting paginated and filtered requests"""
     return db.get_filtered_requests(
@@ -37,7 +39,9 @@ def get_requests(
         ownerName=ownerName,
         fromDate=fromDate,
         toDate=toDate,
-        preferredTime=preferredTime
+        preferredTime=preferredTime,
+        sortField=sortField,
+        sortOrder=sortOrder
     )
 
 @router.get("/get/requests/stats")
