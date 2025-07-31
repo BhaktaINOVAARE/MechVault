@@ -22,9 +22,15 @@ import { RequestFormComponent } from '../../request-form/request-form';
 import { RequestDetailsComponent } from '../../request-details/request-details';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {MatDatepicker,MatDatepickerModule,MatDatepickerToggle,} from '@angular/material/datepicker';
+import {
+  MatDatepicker,
+  MatDatepickerModule,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { formatDate } from '@angular/common';
 
 //newly added for sorting functionality
 function compare(a: any, b: any, isAsc: boolean): number {
@@ -51,10 +57,13 @@ function compare(a: any, b: any, isAsc: boolean): number {
     MatDatepickerToggle,
     FormsModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
   ],
   templateUrl: './services.html',
   styleUrls: ['./services.css'],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-IN' }, // Set to Indian timezone
+  ],
 })
 export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = [
@@ -85,7 +94,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   searchParams = {
     vehicleNo: '',
     ownerName: '',
-    preferredDate: null as Date | null,
+    fromDate: null as Date | null,
+    toDate: null as Date | null,
     preferredTime: '',
   };
 
@@ -124,7 +134,11 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.paginator.page.subscribe(() => {
-      this.fetchRequests(this.paginator.pageIndex, this.paginator.pageSize,this.searchParams);
+      this.fetchRequests(
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.searchParams
+      );
     });
 
     this.sort.sortChange.subscribe(() => {
@@ -208,15 +222,21 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Add search parameters if they exist
     if (searchParams) {
-      if (this.searchParams.vehicleNo)
-        params.vehicleNo = this.searchParams.vehicleNo;
-      if (this.searchParams.ownerName)
-        params.ownerName = this.searchParams.ownerName;
-      if (this.searchParams.preferredDate)
-        params.preferredDate = this.searchParams.preferredDate;
-      if (this.searchParams.preferredTime)
-        params.preferredTime = this.searchParams.preferredTime;
+      if (searchParams.vehicleNo) params.vehicleNo = searchParams.vehicleNo;
+      if (searchParams.ownerName) params.ownerName = searchParams.ownerName;
+      if (searchParams.fromDate && searchParams.toDate) {
+        params.fromDate = searchParams.fromDate;
+        params.toDate = searchParams.toDate;
+      } else if (searchParams.fromDate) {
+        params.fromDate = searchParams.fromDate;
+      } else if (searchParams.toDate) {
+        params.toDate = searchParams.toDate;
+      }
+      if (searchParams.preferredTime)
+        params.preferredTime = searchParams.preferredTime;
     }
+
+    console.log('Sending to API:', params);
 
     this.requestService.getAllRequests(params).subscribe({
       next: (response) => {
@@ -252,9 +272,49 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //newly added method for advanced filtering search
   applyAdvancedSearch(): void {
+    if (!this.validateDateRange()) {
+      this.snackBar.open('Error: End date must be after start date', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar'],
+      });
+      return;
+    }
+
     // Reset to first page when applying new search
     this.paginator.pageIndex = 0;
-    this.fetchRequests(0, this.paginator.pageSize, this.searchParams);
+
+    // Create API params with properly formatted date
+    const apiParams = {
+      vehicleNo: this.searchParams.vehicleNo,
+      ownerName: this.searchParams.ownerName,
+      fromDate: this.formatDateForAPI(this.searchParams.fromDate),
+      toDate: this.formatDateForAPI(this.searchParams.toDate),
+      preferredTime: this.searchParams.preferredTime,
+    };
+
+    console.log('formatted API params:', apiParams);
+    this.fetchRequests(0, this.paginator.pageSize, apiParams);
+  }
+
+  // private formatDateForAPI(date: Date | string | null): string {
+  //   if (!date) return '';
+
+  //   const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  //   // ✅ Extract local date parts without UTC shift
+  //   const year = dateObj.getFullYear();
+  //   const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  //   const day = String(dateObj.getDate()).padStart(2, '0');
+
+  //   return `${year}-${month}-${day}`;
+  // }
+
+  private formatDateForAPI(date: Date | null): string {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // stays in IST
   }
 
   //newly added method
@@ -265,7 +325,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchParams = {
       vehicleNo: '',
       ownerName: '',
-      preferredDate: null,
+      fromDate: null,
+      toDate: null,
       preferredTime: '',
     };
 
@@ -279,22 +340,31 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Safe date formatter for display
-  formatDateForDisplay(dateString: string | Date): string {
-    if (!dateString) return '-';
-
+  formatDateForDisplay(utcDate: string | Date): string {
+    if (!utcDate) return '-';
     try {
-      const date = new Date(dateString);
-      return isNaN(date.getTime())
-        ? String(dateString) // Return raw string if invalid
-        : date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          });
+      const date = new Date(utcDate);
+      return formatDate(date, 'dd-MMM-yyyy', 'en-US', 'Asia/Kolkata');
     } catch {
-      return String(dateString);
+      return String(utcDate);
     }
   }
+
+  validateDateRange(): boolean {
+    if (this.searchParams.fromDate && this.searchParams.toDate) {
+      return this.searchParams.fromDate <= this.searchParams.toDate;
+    }
+    return true;
+  }
+  // formatDateForRequest(date: Date): string {
+  //   // Convert Material Datepicker date to Indian time string
+  //   return formatDate(
+  //     date,
+  //     "EEE MMM d y HH:mm:ss 'GMT'ZZZZ",
+  //     'en-US',
+  //     'Asia/Kolkata'
+  //   );
+  // }
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;

@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 from bson import ObjectId
 from app.database import collection
 from app.schemas.service_request import ServiceRequestSchema
 from typing import Optional, Dict, Any
 from pytz import timezone
+from fastapi import HTTPException
 
 def serialize(doc: dict) -> dict:
     """Convert MongoDB document to JSON-serializable dict."""
@@ -17,41 +18,70 @@ def serialize(doc: dict) -> dict:
 def build_query(
     vehicleNo: Optional[str] = None,
     ownerName: Optional[str] = None,
-    preferredDate: Optional[str] = None,
+    fromDate: Optional[str] = None,
+    toDate: Optional[str] = None,
     preferredTime: Optional[str] = None
 ) -> Dict[str, Any]:
-    """Build MongoDB query dictionary based on filters"""
+    """Build MongoDB query dictionary based on filters (string-safe date matching)."""
     query = {}
-    
+
+    # Vehicle Number filter
     if vehicleNo:
         query["vehicle_number"] = {"$regex": vehicleNo, "$options": "i"}
+
+    # Owner Name filter
     if ownerName:
         query["name"] = {"$regex": ownerName, "$options": "i"}
-    if preferredDate:
-        query["requested_date"] = preferredDate
+
+    # Date Range filter (string-safe for ISO 8601)
+    if fromDate or toDate:
+        date_query = {}
+
+        if fromDate:
+            if "T" not in fromDate:
+                fromDate = f"{fromDate}T00:00:00.000Z"
+            date_query["$gte"] = fromDate
+
+        if toDate:
+            if "T" not in toDate:
+                toDate = f"{toDate}T23:59:59.999Z"
+            date_query["$lte"] = toDate
+
+        if date_query:
+            query["requested_date"] = date_query
+
+    # Preferred Time filter
     if preferredTime:
         query["requested_time"] = preferredTime
-        
+
+    print(f"✅ Final query sent to Mongo: {query}")  # Debug
     return query
+
 
 def get_filtered_requests(
     skip: int = 0,
     limit: int = 5,
     vehicleNo: Optional[str] = None,
     ownerName: Optional[str] = None,
-    preferredDate: Optional[str] = None,
+    fromDate: Optional[str] = None,
+    toDate: Optional[str] = None,
     preferredTime: Optional[str] = None
 ) -> Dict[str, Any]:
-    """Get paginated and filtered requests"""
-    query = build_query(vehicleNo, ownerName, preferredDate, preferredTime)
+    """Get paginated and filtered requests with fromDate/toDate support."""
     
+    query = build_query(vehicleNo, ownerName, fromDate, toDate, preferredTime)
+
+    # 🔍 Debug: Check what we're actually querying
+    print(f"📌 Mongo Query: {query}")
+
     cursor = collection.find(query).skip(skip).limit(limit)
     total = collection.count_documents(query)
-    
+
     return {
         "requests": [serialize(doc) for doc in cursor],
         "total": total
     }
+
 
 def convert_to_utc(indian_time_str: str) -> datetime:
     """Convert Indian time string to UTC datetime"""

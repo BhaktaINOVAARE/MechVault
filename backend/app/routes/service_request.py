@@ -25,7 +25,8 @@ def get_requests(
     limit: int = Query(5, gt=0),
     vehicleNo: Optional[str] = None,
     ownerName: Optional[str] = None,
-    preferredDate: Optional[str] = None,
+    fromDate: Optional[str] = None,
+    toDate: Optional[str] = None,
     preferredTime: Optional[str] = None
 ):
     """Endpoint for getting paginated and filtered requests"""
@@ -34,7 +35,8 @@ def get_requests(
         limit=limit,
         vehicleNo=vehicleNo,
         ownerName=ownerName,
-        preferredDate=preferredDate,
+        fromDate=fromDate,
+        toDate=toDate,
         preferredTime=preferredTime
     )
 

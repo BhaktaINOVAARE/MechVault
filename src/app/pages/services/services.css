@@ -146,6 +146,16 @@ button[disabled] mat-icon {
   margin-left: auto;
 }
 
+.error-snackbar {
+  background-color: #f44336; /* Red color for error */
+  color: white;
+}
+
+/* Highlight invalid date range */
+.mat-datepicker-input-invalid {
+  border-color: #f44336;
+}
+
 /* Responsive adjustments */
 @media (max-width: 800px) {
   .search-fields mat-form-field {
