@@ -20,10 +20,10 @@ import { CommonModule } from '@angular/common';
     CommonModule
   ],
   template: `
-    <h2 mat-dialog-title>Service Details</h2>
+    <h2 mat-dialog-title class="title">Service Details</h2>
     <mat-dialog-content class="request-details">
       <div *ngFor="let field of displayedFields" class="detail-row">
-        <strong>{{ field.label }}:</strong>
+        <span class="field-label">{{ field.label }}:</span>
         {{ getFieldValue(field.key) }}
       </div>
     </mat-dialog-content>
@@ -32,16 +32,29 @@ import { CommonModule } from '@angular/common';
     </mat-dialog-actions>
   `,
   styles: [`
+  .title{
+    margin-left: 10px;
+    margin-top: 10px;
+    font-size: 1.8em;
+    color: #247df2ff;
+    font-weight: 500;
+
+  }
     .detail-row {
       margin: 12px 2px;
-      padding: 15px;
-      background: #4e9bff54;
+      padding: 3px;
+      // background: #4e9bff54;
       border-radius: 25px;
+      font-size: 1.4em;
     }
     .request-details {
       max-height: 500px;
       overflow-y: auto;
       padding: 30px;
+    }
+    .field-label{
+      
+      font-weight: bold;
     }
     
   `]

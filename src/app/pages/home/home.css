@@ -298,6 +298,67 @@ p {
     flex-wrap: wrap;
 }
 
+
+/* this is for horizontal strip */
+.partners {
+    padding: 50px 0;
+    background: #f9f9f9;
+}
+
+.partners-title {
+    text-align: center;
+    font-size: 2.6rem;
+    margin-bottom: 35px;
+}
+
+.partners-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.partners-strip {
+    display: flex;
+    white-space: nowrap;
+}
+
+.partners-track {
+    display: flex;
+    animation: scroll 20s linear infinite;
+}
+
+.partners-track img {
+    height: 50px;
+    margin: 0 30px;
+    object-fit: contain;
+}
+
+@keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Gradient edges */
+.gradient-left,
+.gradient-right {
+    position: absolute;
+    top: 0;
+    width: 100px;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.gradient-left {
+    left: 0;
+    background: linear-gradient(to right, #f9f9f9, transparent);
+}
+
+.gradient-right {
+    right: 0;
+    background: linear-gradient(to left, #f9f9f9, transparent);
+}
+
+
 /* --- Responsive Design --- */
 @media (max-width: 992px) {
     .hero h1 { 

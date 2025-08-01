@@ -101,39 +101,13 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
   lastUsedFilters: any = {};
 
 
-  // ngOnInit(): void {
-  //   this.fetchRequests();
-  // }
+ 
   ngOnInit(): void {
     this.lastUsedFilters = {}; //default empty
     this.fetchRequests(0, this.paginator?.pageSize || 5);
   }
 
-  // ngAfterViewInit(): void {
-  //   this.dataSource.sort = this.sort;
-  //   this.dataSource.paginator = this.paginator;
-
-  //   this.dataSource.sortingDataAccessor = (
-  //     item: ServiceRequest,
-  //     property: string
-  //   ): string | number => {
-  //     // Explicitly handle each sortable property
-  //     switch (property) {
-  //       case 'preferredDate':
-  //         return new Date(item.preferredDate).getTime();
-  //       case 'vehicleNo':
-  //         return item.vehicleNo;
-  //       case 'ownerName':
-  //         return item.ownerName;
-  //       case 'preferredTime':
-  //         return item.preferredTime;
-  //       case 'status':
-  //         return item.status;
-  //       default:
-  //         return '';
-  //     }
-  //   };
-  // }
+  
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
 
@@ -145,9 +119,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
-    // this.sort.sortChange.subscribe(() => {
-    //   this.sortCurrentPageData();
-    // });
+
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0; // reset to first page
       this.fetchRequests(
@@ -195,34 +167,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  // fetchRequests(): void {
-  //   this.requestService.getAllRequests().subscribe({
-  //     next: (backendRequests) => {
-  //       const transformedRequests = backendRequests.map((request: any) => ({
-  //         id: request.id,
-  //         vehicleNo: request.vehicle_number,
-  //         ownerName: request.name,
-  //         vehicleModel: request.model,
-  //         preferredDate: request.requested_date,
-  //         preferredTime: request.requested_time,
-  //         status: request.status,
-  //         notes: request.notes,
-  //         created_at: request.created_at,
-  //         contactNumber: request.contact_number,
-  //         vehicleType: request.vehicle_type,
-  //       }));
-
-  //       console.log('Transformed requests:', transformedRequests);
-  //       this.dataSource.data = transformedRequests;
-  //     },
-  //     error: (err) => {
-  //       this.snackBar.open('Failed to load requests', 'Close', {
-  //         duration: 3000,
-  //       });
-  //       console.error(err);
-  //     },
-  //   });
-  // }
+  // Fetch requests from the API with pagination and sorting
   fetchRequests(pageIndex: number, pageSize: number, searchParams?: any): void {
     this.isLoading = true; // setting loading state to true
 
@@ -313,18 +258,7 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.fetchRequests(0, this.paginator.pageSize, this.lastUsedFilters);
   }
 
-  // private formatDateForAPI(date: Date | string | null): string {
-  //   if (!date) return '';
-
-  //   const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  //   // ✅ Extract local date parts without UTC shift
-  //   const year = dateObj.getFullYear();
-  //   const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-  //   const day = String(dateObj.getDate()).padStart(2, '0');
-
-  //   return `${year}-${month}-${day}`;
-  // }
+  
 
   private formatDateForAPI(date: Date | null): string {
     if (!date) return '';
@@ -373,16 +307,8 @@ export class ServicesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     return true;
   }
-  // formatDateForRequest(date: Date): string {
-  //   // Convert Material Datepicker date to Indian time string
-  //   return formatDate(
-  //     date,
-  //     "EEE MMM d y HH:mm:ss 'GMT'ZZZZ",
-  //     'en-US',
-  //     'Asia/Kolkata'
-  //   );
-  // }
-
+  
+  // Method to apply filter based on input
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();

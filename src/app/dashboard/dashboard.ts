@@ -28,6 +28,8 @@ import {
 } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 //newly added for sorting functionality
 function compare(a: any, b: any, isAsc: boolean): number {
@@ -63,6 +65,7 @@ interface DashboardStats {
     FormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    NgChartsModule,
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
@@ -105,6 +108,56 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   lastUsedFilters: any = {};
 
+  //this is for charts
+  lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [], // Will be populated dynamically
+    datasets: [
+      {
+        label: 'Total Requests',
+        data: [],
+        borderColor: '#3f51b5',
+        backgroundColor: 'rgba(63, 81, 181, 0.2)',
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'Pending Requests',
+        data: [],
+        borderColor: '#ff9800',
+        backgroundColor: 'rgba(255, 152, 0, 0.2)',
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'Completed Requests',
+        data: [],
+        borderColor: '#4caf50',
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+        tension: 0.3,
+      },
+    ],
+  };
+
+  lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          font: { size: 12 },
+        },
+      },
+    },
+    scales: {
+      x: { title: { display: true, text: 'Date' } },
+      y: {
+        title: { display: true, text: 'Number of Requests' },
+        beginAtZero: true,
+      },
+    },
+  };
+
   // ngOnInit(): void {
   //   this.fetchRequests();
   // }
@@ -113,31 +166,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.fetchRequests(0, this.paginator?.pageSize || 5);
     this.fetchDashboardStats();
+    this.fetchAllRequestsForChart();
   }
 
-  // ngAfterViewInit(): void {
-  //   this.dataSource.sort = this.sort;
-  //   this.dataSource.paginator = this.paginator;
-
-  //   this.dataSource.sortingDataAccessor = (item: ServiceRequest, property: string): string | number => {
-  //     switch (property) {
-  //       case 'preferredDate':
-  //         return new Date(item.preferredDate).getTime();
-  //       case 'vehicleNo':
-  //         return item.vehicleNo;
-  //       case 'ownerName':
-  //         return item.ownerName;
-  //       case 'preferredTime':
-  //         return item.preferredTime;
-  //       case 'status':
-  //         return item.status;
-  //       // case 'created_at':
-  //       //   return item.created_at ?? '';
-  //       default:
-  //         return '';
-  //     }
-  //   };
-  // }
   ngAfterViewInit(): void {
     // Set initial page load after view initialized
     this.fetchRequests(0, this.paginator?.pageSize || 5);
@@ -151,9 +182,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
-    // this.sort.sortChange.subscribe(() => {
-    //   this.sortCurrentPageData();
-    // });
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0; // reset to first page
       this.fetchRequests(
@@ -199,34 +227,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  // fetchRequests(): void {
-  //   this.subscription.add(
-  //     this.requestService.getAllRequests().subscribe({
-  //       next: (backendRequests) => {
-  //         const transformedRequests = backendRequests.map((request: any) => ({
-  //           id: request.id,
-  //           vehicleNo: request.vehicle_number,
-  //           ownerName: request.name,
-  //           vehicleModel: request.model,
-  //           preferredDate: request.requested_date,
-  //           preferredTime: request.requested_time,
-  //           status: request.status,
-  //           notes: request.notes,
-  //           created_at: request.created_at,
-  //         }));
-
-  //         this.dataSource.data = transformedRequests;
-  //         this.calculateStats(transformedRequests);
-  //       },
-  //       error: (err) => {
-  //         this.snackBar.open('Failed to load requests', 'Close', {
-  //           duration: 3000,
-  //         });
-  //         console.error(err);
-  //       },
-  //     })
-  //   );
-  // }
   fetchRequests(pageIndex: number, pageSize: number, searchParams?: any): void {
     this.isLoading = true; // setting loading state to true
 
@@ -275,6 +275,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           }));
 
           this.dataSource.data = [...this.currentPageData];
+          this.updateChartData(this.currentPageData);
           this.paginator.length = response.total;
           this.isLoading = false; // setting loading state to false
 
@@ -296,7 +297,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //newly added method for advanced filtering search
   applyAdvancedSearch(): void {
-
     if (!this.validateDateRange()) {
       this.snackBar.open('Error: End date must be after start date', 'Close', {
         duration: 3000,
@@ -351,6 +351,83 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       })
     );
   }
+
+  fetchAllRequestsForChart(): void {
+    this.requestService.getAllRequests({ skip: 0, limit: 1000 }).subscribe({
+      next: (response) => {
+        const allRequests: ServiceRequest[] = response.requests.map(
+          (request: any) => ({
+            id: request.id || '',
+            vehicleNo: request.vehicle_number || '',
+            ownerName: request.name || '',
+            vehicleModel: request.model || '',
+            preferredDate: request.requested_date,
+            preferredTime: request.requested_time || '',
+            status: request.status,
+            notes: request.notes || '',
+            created_at: request.created_at || '',
+            contactNumber: request.contact_number || '',
+            vehicleType: request.vehicle_type || '',
+          })
+        );
+        this.updateChartData(allRequests); // ✅ Now matches type
+      },
+      error: (err) => console.error('Failed to load chart data', err),
+    });
+  }
+
+  updateChartData(requests: ServiceRequest[]) {
+  const groupedByDate: Record<
+    string,
+    { total: number; pending: number; completed: number }
+  > = {};
+
+  requests.forEach((req) => {
+    const date = new Date(req.preferredDate).toLocaleDateString('en-US');
+    if (!groupedByDate[date]) {
+      groupedByDate[date] = { total: 0, pending: 0, completed: 0 };
+    }
+    groupedByDate[date].total++;
+    if (req.status === 'Pending') groupedByDate[date].pending++;
+    if (req.status === 'Completed') groupedByDate[date].completed++;
+  });
+
+  const sortedDates = Object.keys(groupedByDate).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+
+  // ✅ Create new data object so Angular detects changes
+  this.lineChartData = {
+    labels: sortedDates,
+    datasets: [
+      {
+        label: 'Total Requests',
+        data: sortedDates.map((date) => groupedByDate[date].total),
+        borderColor: '#3f51b5',
+        backgroundColor: 'rgba(63, 81, 181, 0.2)',
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'Pending Requests',
+        data: sortedDates.map((date) => groupedByDate[date].pending),
+        borderColor: '#ff9800',
+        backgroundColor: 'rgba(255, 152, 0, 0.2)',
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'Completed Requests',
+        data: sortedDates.map((date) => groupedByDate[date].completed),
+        borderColor: '#4caf50',
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+        tension: 0.3,
+      },
+    ],
+  };
+}
+
 
   calculateStats(requests: ServiceRequest[]): void {
     this.totalRequests = requests.length;

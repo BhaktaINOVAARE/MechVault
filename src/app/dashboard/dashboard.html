@@ -2,24 +2,38 @@
   <!-- Stats Cards -->
   <div class="stats-container">
     <mat-card class="stat-card-1">
-      <mat-card-title>Total Requests</mat-card-title>
+      <mat-card-title class="card-title-1">Total Requests</mat-card-title>
       <mat-card-content class="stat-value-1">{{
         totalRequests
       }}</mat-card-content>
     </mat-card>
 
     <mat-card class="stat-card-2">
-      <mat-card-title>Pending Requests</mat-card-title>
+      <mat-card-title class="card-title-2">Pending Requests</mat-card-title>
       <mat-card-content class="stat-value-2">{{
         pendingRequests
       }}</mat-card-content>
     </mat-card>
 
     <mat-card class="stat-card-3">
-      <mat-card-title>Completed Requests</mat-card-title>
+      <mat-card-title class="card-title-3">Completed Requests</mat-card-title>
       <mat-card-content class="stat-value-3">{{
         completedRequests
       }}</mat-card-content>
+    </mat-card>
+
+    <!-- Requests Trend Line Chart -->
+    <mat-card class="stat-card-graph">
+      <mat-card-title style="font-weight: bold; font-size: 25px; margin: 15px 0px 10px 25px; color: #009e91;">Requests Trend</mat-card-title>
+      <mat-card-content >
+        <canvas
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'"
+        >
+        </canvas>
+      </mat-card-content>
     </mat-card>
   </div>
 
@@ -82,24 +96,50 @@
 
         <!-- Date Search -->
         <mat-form-field>
-        <mat-label>From Date</mat-label>
-        <input matInput [matDatepicker]="fromDatePicker" [(ngModel)]="searchParams.fromDate" name="fromDate">
-        <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #fromDatePicker></mat-datepicker>
-        <button mat-icon-button matSuffix (click)="searchParams.fromDate = null; applyAdvancedSearch()" *ngIf="searchParams.fromDate">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
+          <mat-label>From Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="fromDatePicker"
+            [(ngModel)]="searchParams.fromDate"
+            name="fromDate"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="fromDatePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #fromDatePicker></mat-datepicker>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="searchParams.fromDate = null; applyAdvancedSearch()"
+            *ngIf="searchParams.fromDate"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>To Date</mat-label>
-        <input matInput [matDatepicker]="toDatePicker" [(ngModel)]="searchParams.toDate" name="toDate">
-        <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #toDatePicker></mat-datepicker>
-        <button mat-icon-button matSuffix (click)="searchParams.toDate = null; applyAdvancedSearch()" *ngIf="searchParams.toDate">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label>To Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="toDatePicker"
+            [(ngModel)]="searchParams.toDate"
+            name="toDate"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="toDatePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #toDatePicker></mat-datepicker>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="searchParams.toDate = null; applyAdvancedSearch()"
+            *ngIf="searchParams.toDate"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
 
         <!-- Time Search -->
         <mat-form-field>
